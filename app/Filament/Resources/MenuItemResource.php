@@ -8,6 +8,7 @@ use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Tables\Actions\DeleteAction;
 
 class MenuItemResource extends Resource
 {
@@ -27,7 +28,14 @@ class MenuItemResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->columns();
+            ->columns([
+                Tables\Columns\ActionsColumn::make([
+                    DeleteAction::make()
+                        ->icon('heroicon-o-trash')
+                        ->color('danger')
+                        ->requiresConfirmation(),
+                ]),
+            ]);
     }
 
     public static function getRelations(): array

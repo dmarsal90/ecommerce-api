@@ -12,6 +12,7 @@ use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Tables\Actions\DeleteAction;
 
 class OrderResource extends Resource
 {
@@ -156,6 +157,12 @@ class OrderResource extends Resource
                 ])->label('Payment'),
                 Tables\Columns\TextColumn::make('total')->money('USD')->sortable(),
                 Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable(),
+                Tables\Columns\ActionsColumn::make([
+                    DeleteAction::make()
+                        ->icon('heroicon-o-trash')
+                        ->color('danger')
+                        ->requiresConfirmation(),
+                ]),
             ]);
     }
 
