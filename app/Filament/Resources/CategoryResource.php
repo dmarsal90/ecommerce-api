@@ -18,7 +18,6 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Filament\Tables\Actions\DeleteAction;
 use Illuminate\Database\Eloquent\Builder;
 
 class CategoryResource extends Resource
@@ -78,12 +77,13 @@ class CategoryResource extends Resource
                 IconColumn::make('is_active')->boolean(),
                 TextColumn::make('sort_order')->sortable(),
                 TextColumn::make('created_at')->dateTime()->sortable(),
-                Tables\Columns\ActionsColumn::make([
-                    DeleteAction::make()
-                        ->icon('heroicon-o-trash')
-                        ->color('danger')
-                        ->requiresConfirmation(),
-                ]),
+            ])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+                DeleteAction::make()
+                    ->icon('heroicon-o-trash')
+                    ->color('danger')
+                    ->requiresConfirmation(),
             ]);
     }
 

@@ -9,7 +9,6 @@ use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Tables\Actions\DeleteAction;
 use Spatie\Permission\Models\Permission;
 
 class PermissionResource extends Resource
@@ -48,12 +47,13 @@ class PermissionResource extends Resource
                 Tables\Columns\TextColumn::make('name')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('guard_name')->badge(),
                 Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable(),
-                Tables\Columns\ActionsColumn::make([
-                    DeleteAction::make()
-                        ->icon('heroicon-o-trash')
-                        ->color('danger')
-                        ->requiresConfirmation(),
-                ]),
+            ])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+                DeleteAction::make()
+                    ->icon('heroicon-o-trash')
+                    ->color('danger')
+                    ->requiresConfirmation(),
             ]);
     }
 

@@ -11,7 +11,6 @@ use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Tables\Actions\DeleteAction;
 use Illuminate\Support\Str;
 
 class TagResource extends Resource
@@ -58,12 +57,13 @@ class TagResource extends Resource
                 Tables\Columns\IconColumn::make('is_active')->boolean(),
                 Tables\Columns\TextColumn::make('sort_order')->sortable(),
                 Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable(),
-                Tables\Columns\ActionsColumn::make([
-                    DeleteAction::make()
-                        ->icon('heroicon-o-trash')
-                        ->color('danger')
-                        ->requiresConfirmation(),
-                ]),
+            ])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+                DeleteAction::make()
+                    ->icon('heroicon-o-trash')
+                    ->color('danger')
+                    ->requiresConfirmation(),
             ]);
     }
 

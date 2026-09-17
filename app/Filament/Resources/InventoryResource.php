@@ -11,7 +11,6 @@ use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Tables\Actions\DeleteAction;
 
 class InventoryResource extends Resource
 {
@@ -77,12 +76,13 @@ class InventoryResource extends Resource
                 Tables\Columns\IconColumn::make('low_stock')->boolean()->label('Low Stock'),
                 Tables\Columns\TextColumn::make('location')->limit(30),
                 Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable(),
-                Tables\Columns\ActionsColumn::make([
-                    DeleteAction::make()
-                        ->icon('heroicon-o-trash')
-                        ->color('danger')
-                        ->requiresConfirmation(),
-                ]),
+            ])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+                DeleteAction::make()
+                    ->icon('heroicon-o-trash')
+                    ->color('danger')
+                    ->requiresConfirmation(),
             ]);
     }
 

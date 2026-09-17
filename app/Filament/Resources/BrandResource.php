@@ -14,7 +14,6 @@ use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Tables\Actions\DeleteAction;
 
 class BrandResource extends Resource
 {
@@ -67,12 +66,13 @@ class BrandResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')->searchable(),
                 Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable(),
-                Tables\Columns\ActionsColumn::make([
-                    DeleteAction::make()
-                        ->icon('heroicon-o-trash')
-                        ->color('danger')
-                        ->requiresConfirmation(),
-                ]),
+            ])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+                DeleteAction::make()
+                    ->icon('heroicon-o-trash')
+                    ->color('danger')
+                    ->requiresConfirmation(),
             ]);
     }
 
