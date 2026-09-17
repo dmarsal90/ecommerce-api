@@ -15,6 +15,8 @@ use App\Filament\Resources\ProductResource\RelationManagers\VariantsRelationMana
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\DeleteAction;
 use Illuminate\Support\Str;
 
 class ProductResource extends Resource
