@@ -33,7 +33,7 @@ class HomepageBlockResource extends Resource
                 // Add your columns here
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                EditAction::make(),
                 DeleteAction::make()
                     ->icon('heroicon-o-trash')
                     ->color('danger')

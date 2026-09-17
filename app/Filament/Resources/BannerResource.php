@@ -136,7 +136,7 @@ class BannerResource extends Resource
                     ]),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([

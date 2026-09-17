@@ -92,7 +92,7 @@ class ProductAttributeResource extends Resource
                 Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                EditAction::make(),
                 DeleteAction::make()
                     ->icon('heroicon-o-trash')
                     ->color('danger')
