@@ -12,6 +12,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Actions\DeleteAction;
 
 class StockMovementResource extends Resource
@@ -93,6 +94,7 @@ class StockMovementResource extends Resource
                 Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable(),
             ])
             ->actions([
+                ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make()
                     ->icon('heroicon-o-trash')
@@ -112,6 +114,7 @@ class StockMovementResource extends Resource
     {
         return [
             'index' => Pages\ListStockMovements::route('/'),
+            'view' => Pages\ViewStockMovement::route('/{record}'),
         ];
     }
 }

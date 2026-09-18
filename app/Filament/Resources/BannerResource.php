@@ -136,6 +136,7 @@ class BannerResource extends Resource
                     ]),
             ])
             ->actions([
+                ViewAction::make(),
                 EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
@@ -158,6 +159,7 @@ class BannerResource extends Resource
         return [
             'index' => Pages\ListBanners::route('/'),
             'create' => Pages\CreateBanner::route('/create'),
+            'view' => Pages\ViewBanner::route('/{record}'),
             'edit' => Pages\EditBanner::route('/{record}/edit'),
         ];
     }

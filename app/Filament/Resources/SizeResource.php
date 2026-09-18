@@ -12,6 +12,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Actions\DeleteAction;
 use Illuminate\Support\Str;
 
@@ -71,6 +72,7 @@ class SizeResource extends Resource
                 Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable(),
             ])
             ->actions([
+                ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make()
                     ->icon('heroicon-o-trash')
@@ -91,6 +93,7 @@ class SizeResource extends Resource
         return [
             'index' => Pages\ListSizes::route('/'),
             'create' => Pages\CreateSize::route('/create'),
+            'view' => Pages\ViewSize::route('/{record}'),
             'edit' => Pages\EditSize::route('/{record}/edit'),
         ];
     }

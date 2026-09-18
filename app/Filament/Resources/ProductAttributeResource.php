@@ -13,6 +13,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Actions\DeleteAction;
 use Illuminate\Support\Str;
 
@@ -92,6 +93,7 @@ class ProductAttributeResource extends Resource
                 Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable(),
             ])
             ->actions([
+                ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make()
                     ->icon('heroicon-o-trash')
@@ -112,6 +114,7 @@ class ProductAttributeResource extends Resource
         return [
             'index' => Pages\ListProductAttributes::route('/'),
             'create' => Pages\CreateProductAttribute::route('/create'),
+            'view' => Pages\ViewProductAttribute::route('/{record}'),
             'edit' => Pages\EditProductAttribute::route('/{record}/edit'),
         ];
     }

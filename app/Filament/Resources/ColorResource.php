@@ -12,6 +12,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Actions\DeleteAction;
 use Illuminate\Support\Str;
 
@@ -62,6 +63,7 @@ class ColorResource extends Resource
                 Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable(),
             ])
             ->actions([
+                ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make()
                     ->icon('heroicon-o-trash')
@@ -82,6 +84,7 @@ class ColorResource extends Resource
         return [
             'index' => Pages\ListColors::route('/'),
             'create' => Pages\CreateColor::route('/create'),
+            'view' => Pages\ViewColor::route('/{record}'),
             'edit' => Pages\EditColor::route('/{record}/edit'),
         ];
     }

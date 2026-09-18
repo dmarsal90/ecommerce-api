@@ -9,6 +9,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Actions\DeleteAction;
 
 class HomepageBlockResource extends Resource
@@ -33,6 +34,7 @@ class HomepageBlockResource extends Resource
                 // Add your columns here
             ])
             ->actions([
+                ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make()
                     ->icon('heroicon-o-trash')
@@ -53,6 +55,7 @@ class HomepageBlockResource extends Resource
         return [
             'index' => Pages\ListHomepageBlocks::route('/'),
             'create' => Pages\CreateHomepageBlock::route('/create'),
+            'view' => Pages\ViewHomepageBlock::route('/{record}'),
             'edit' => Pages\EditHomepageBlock::route('/{record}/edit'),
         ];
     }

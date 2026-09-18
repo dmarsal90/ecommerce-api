@@ -15,6 +15,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Actions\DeleteAction;
 
 class CollectionResource extends Resource
@@ -79,6 +80,7 @@ class CollectionResource extends Resource
                 Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable(),
             ])
             ->actions([
+                ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make()
                     ->icon('heroicon-o-trash')
@@ -99,6 +101,7 @@ class CollectionResource extends Resource
         return [
             'index' => Pages\ListCollections::route('/'),
             'create' => Pages\CreateCollection::route('/create'),
+            'view' => Pages\ViewCollection::route('/{record}'),
             'edit' => Pages\EditCollection::route('/{record}/edit'),
         ];
     }

@@ -9,6 +9,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Actions\DeleteAction;
 
 class MenuItemResource extends Resource
@@ -33,6 +34,7 @@ class MenuItemResource extends Resource
                 // Add your columns here
             ])
             ->actions([
+                ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make()
                     ->icon('heroicon-o-trash')
@@ -53,6 +55,7 @@ class MenuItemResource extends Resource
         return [
             'index' => Pages\ListMenuItems::route('/'),
             'create' => Pages\CreateMenuItem::route('/create'),
+            'view' => Pages\ViewMenuItem::route('/{record}'),
             'edit' => Pages\EditMenuItem::route('/{record}/edit'),
         ];
     }

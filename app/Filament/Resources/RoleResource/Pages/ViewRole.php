@@ -1,0 +1,18 @@
+<?php
+
+namespace App\Filament\Resources\Role\Pages;
+
+use App\Filament\Resources\Role\RoleResource;
+use Filament\Resources\Pages\ViewRecord;
+
+class ViewRole extends ViewRecord
+{
+    protected static string $resource = RoleResource::class;
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            RoleResource\Pages\EditRole::make(),
+        ];
+    }
+}
