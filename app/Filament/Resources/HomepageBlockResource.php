@@ -34,12 +34,13 @@ class HomepageBlockResource extends Resource
                 // Add your columns here
             ])
             ->actions([
-                ViewAction::make(),
-                EditAction::make(),
+                ViewAction::make()->iconButton(),
+                EditAction::make()->iconButton(),
                 DeleteAction::make()
                     ->icon('heroicon-o-trash')
                     ->color('danger')
-                    ->requiresConfirmation(),
+                    ->requiresConfirmation()
+                    ->iconButton(),
             ]);
     }
 

@@ -81,12 +81,13 @@ class InventoryResource extends Resource
                 Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable(),
             ])
             ->actions([
-                ViewAction::make(),
-                EditAction::make(),
+                ViewAction::make()->iconButton(),
+                EditAction::make()->iconButton(),
                 DeleteAction::make()
                     ->icon('heroicon-o-trash')
                     ->color('danger')
-                    ->requiresConfirmation(),
+                    ->requiresConfirmation()
+                    ->iconButton(),
             ]);
     }
 

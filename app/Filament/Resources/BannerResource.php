@@ -136,9 +136,13 @@ class BannerResource extends Resource
                     ]),
             ])
             ->actions([
-                ViewAction::make(),
-                EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                ViewAction::make()->iconButton(),
+                EditAction::make()->iconButton(),
+                DeleteAction::make()
+                    ->icon('heroicon-o-trash')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->iconButton(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
