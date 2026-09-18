@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\Size\Pages;
+namespace App\Filament\Resources\SizeResource\Pages;
 
-use App\Filament\Resources\Size\SizeResource;
+use App\Filament\Resources\SizeResource;
 use Filament\Resources\Pages\ViewRecord;
 
 class ViewSize extends ViewRecord

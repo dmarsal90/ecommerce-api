@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\Role\Pages;
+namespace App\Filament\Resources\RoleResource\Pages;
 
-use App\Filament\Resources\Role\RoleResource;
+use App\Filament\Resources\RoleResource;
 use Filament\Resources\Pages\ViewRecord;
 
 class ViewRole extends ViewRecord

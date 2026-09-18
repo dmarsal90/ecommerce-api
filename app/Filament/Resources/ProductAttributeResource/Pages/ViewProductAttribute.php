@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\ProductAttribute\Pages;
+namespace App\Filament\Resources\ProductAttributeResource\Pages;
 
-use App\Filament\Resources\ProductAttribute\ProductAttributeResource;
+use App\Filament\Resources\ProductAttributeResource;
 use Filament\Resources\Pages\ViewRecord;
 
 class ViewProductAttribute extends ViewRecord

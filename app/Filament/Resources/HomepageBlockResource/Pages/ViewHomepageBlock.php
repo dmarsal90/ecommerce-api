@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\HomepageBlock\Pages;
+namespace App\Filament\Resources\HomepageBlockResource\Pages;
 
-use App\Filament\Resources\HomepageBlock\HomepageBlockResource;
+use App\Filament\Resources\HomepageBlockResource;
 use Filament\Resources\Pages\ViewRecord;
 
 class ViewHomepageBlock extends ViewRecord

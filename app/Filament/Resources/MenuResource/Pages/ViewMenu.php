@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\Menu\Pages;
+namespace App\Filament\Resources\MenuResource\Pages;
 
-use App\Filament\Resources\Menu\MenuResource;
+use App\Filament\Resources\MenuResource;
 use Filament\Resources\Pages\ViewRecord;
 
 class ViewMenu extends ViewRecord

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\Tag\Pages;
+namespace App\Filament\Resources\TagResource\Pages;
 
-use App\Filament\Resources\Tag\TagResource;
+use App\Filament\Resources\TagResource;
 use Filament\Resources\Pages\ViewRecord;
 
 class ViewTag extends ViewRecord

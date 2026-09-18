@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\Review\Pages;
+namespace App\Filament\Resources\ReviewResource\Pages;
 
-use App\Filament\Resources\Review\ReviewResource;
+use App\Filament\Resources\ReviewResource;
 use Filament\Resources\Pages\ViewRecord;
 
 class ViewReview extends ViewRecord

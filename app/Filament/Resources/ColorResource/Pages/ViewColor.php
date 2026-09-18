@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\Color\Pages;
+namespace App\Filament\Resources\ColorResource\Pages;
 
-use App\Filament\Resources\Color\ColorResource;
+use App\Filament\Resources\ColorResource;
 use Filament\Resources\Pages\ViewRecord;
 
 class ViewColor extends ViewRecord

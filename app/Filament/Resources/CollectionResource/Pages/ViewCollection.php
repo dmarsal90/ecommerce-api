@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\Collection\Pages;
+namespace App\Filament\Resources\CollectionResource\Pages;
 
-use App\Filament\Resources\Collection\CollectionResource;
+use App\Filament\Resources\CollectionResource;
 use Filament\Resources\Pages\ViewRecord;
 
 class ViewCollection extends ViewRecord

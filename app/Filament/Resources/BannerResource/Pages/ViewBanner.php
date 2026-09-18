@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\Banner\Pages;
+namespace App\Filament\Resources\BannerResource\Pages;
 
-use App\Filament\Resources\Banner\BannerResource;
+use App\Filament\Resources\BannerResource;
 use Filament\Resources\Pages\ViewRecord;
 
 class ViewBanner extends ViewRecord

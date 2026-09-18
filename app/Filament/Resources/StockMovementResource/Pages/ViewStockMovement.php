@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\StockMovement\Pages;
+namespace App\Filament\Resources\StockMovementResource\Pages;
 
-use App\Filament\Resources\StockMovement\StockMovementResource;
+use App\Filament\Resources\StockMovementResource;
 use Filament\Resources\Pages\ViewRecord;
 
 class ViewStockMovement extends ViewRecord

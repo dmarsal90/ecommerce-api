@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\Inventory\Pages;
+namespace App\Filament\Resources\InventoryResource\Pages;
 
-use App\Filament\Resources\Inventory\InventoryResource;
+use App\Filament\Resources\InventoryResource;
 use Filament\Resources\Pages\ViewRecord;
 
 class ViewInventory extends ViewRecord

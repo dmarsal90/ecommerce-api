@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\Page\Pages;
+namespace App\Filament\Resources\PageResource\Pages;
 
-use App\Filament\Resources\Page\PageResource;
+use App\Filament\Resources\PageResource;
 use Filament\Resources\Pages\ViewRecord;
 
 class ViewPage extends ViewRecord
