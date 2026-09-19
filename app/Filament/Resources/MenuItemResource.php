@@ -34,11 +34,11 @@ class MenuItemResource extends Resource
                 // Add your columns here
             ])
             ->actions([
-                ViewAction::make()->iconButton(),
-                EditAction::make()->iconButton(),
+                ViewAction::make()->iconButton()->color('sky-500'),
+                EditAction::make()->iconButton()->color('yellow-500'),
                 DeleteAction::make()
                     ->icon('heroicon-o-trash')
-                    ->color('danger')
+                    ->color('red-600')
                     ->requiresConfirmation()
                     ->iconButton(),
             ]);
