@@ -79,11 +79,11 @@ class PageResource extends Resource
                 Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable(),
             ])
             ->actions([
-                ViewAction::make()->iconButton()->color('sky-500'),
-                EditAction::make()->iconButton()->color('yellow-500'),
+                ViewAction::make()->iconButton()->color('info'),
+                EditAction::make()->iconButton()->color('warning'),
                 DeleteAction::make()
                     ->icon('heroicon-o-trash')
-                    ->color('red-600')
+                    ->color('danger')
                     ->requiresConfirmation()
                     ->iconButton(),
             ]);

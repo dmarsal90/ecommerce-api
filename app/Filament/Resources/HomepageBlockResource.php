@@ -34,11 +34,11 @@ class HomepageBlockResource extends Resource
                 // Add your columns here
             ])
             ->actions([
-                ViewAction::make()->iconButton()->color('sky-500'),
-                EditAction::make()->iconButton()->color('yellow-500'),
+                ViewAction::make()->iconButton()->color('info'),
+                EditAction::make()->iconButton()->color('warning'),
                 DeleteAction::make()
                     ->icon('heroicon-o-trash')
-                    ->color('red-600')
+                    ->color('danger')
                     ->requiresConfirmation()
                     ->iconButton(),
             ]);
