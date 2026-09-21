@@ -5,10 +5,13 @@ namespace App\Filament\Resources\Users\Pages;
 use App\Filament\Resources\Users\UserResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Pages\PageConfiguration;
 
 class ListUsers extends ListRecords
 {
     protected static string $resource = UserResource::class;
+
+    protected static ?string $configurationClass = PageConfiguration::class;
 
     protected function getHeaderActions(): array
     {
