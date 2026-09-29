@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\CategoryResource\Pages;
 
 use App\Filament\Resources\CategoryResource;
-use Filament\Resources\Pages\ViewRecord;
 use Filament\Pages\PageConfiguration;
+use Filament\Resources\Pages\ViewRecord;
 
 class ViewCategory extends ViewRecord
 {
@@ -15,7 +15,7 @@ class ViewCategory extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            CategoryResource\Pages\EditCategory::make(),
+            EditCategory::make(),
         ];
     }
 }

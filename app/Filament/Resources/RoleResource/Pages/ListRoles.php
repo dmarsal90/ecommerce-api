@@ -4,8 +4,8 @@ namespace App\Filament\Resources\RoleResource\Pages;
 
 use App\Filament\Resources\RoleResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
 use Filament\Pages\PageConfiguration;
+use Filament\Resources\Pages\ListRecords;
 
 class ListRoles extends ListRecords
 {

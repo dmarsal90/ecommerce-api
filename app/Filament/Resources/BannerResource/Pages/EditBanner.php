@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\BannerResource\Pages;
 
 use App\Filament\Resources\BannerResource;
-use Filament\Resources\Pages\EditRecord;
 use Filament\Pages\PageConfiguration;
+use Filament\Resources\Pages\EditRecord;
 
 class EditBanner extends EditRecord
 {

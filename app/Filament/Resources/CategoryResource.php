@@ -4,24 +4,21 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CategoryResource\Pages;
 use App\Models\Category;
-use Illuminate\Support\Str;
-use Filament\Schemas\Schema;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Resources\Resource;
 use Filament\Schemas\Components\FileUpload;
 use Filament\Schemas\Components\Select;
 use Filament\Schemas\Components\Textarea;
 use Filament\Schemas\Components\TextInput;
 use Filament\Schemas\Components\Toggle;
-use Filament\Schemas\Components\Utilities\Set;
-use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Filament\Actions\EditAction;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\ViewAction;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Str;
 
 class CategoryResource extends Resource
 {
@@ -30,6 +27,7 @@ class CategoryResource extends Resource
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-tag';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Catalog';
+
     protected static ?int $navigationSort = 1;
 
     public static function form(Schema $schema): Schema

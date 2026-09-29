@@ -3,21 +3,20 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductResource\Pages;
-use App\Models\Product;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\RichEditor;
-use Filament\Schemas\Schema;
 use App\Filament\Resources\ProductResource\RelationManagers\VariantsRelationManager;
+use App\Models\Product;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Actions\EditAction;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\ViewAction;
 use Illuminate\Support\Str;
 
 class ProductResource extends Resource
@@ -27,6 +26,7 @@ class ProductResource extends Resource
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-shopping-bag';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Catalog';
+
     public static function form(Schema $schema): Schema
     {
         return $schema

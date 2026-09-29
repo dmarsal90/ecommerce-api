@@ -20,7 +20,7 @@ use Spatie\Permission\Traits\HasRoles;
 
 #[Fillable(['name', 'email', 'password', 'avatar_url'])]
 #[Hidden(['password', 'remember_token'])]
-class User extends Authenticatable implements HasMedia, HasAvatar
+class User extends Authenticatable implements HasAvatar, HasMedia
 {
     /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, HasRoles, InteractsWithMedia, Notifiable;

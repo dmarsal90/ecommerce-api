@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 class Menu extends Model
 {
@@ -44,7 +45,7 @@ class Menu extends Model
 
         static::creating(function ($menu) {
             if (empty($menu->slug)) {
-                $menu->slug = \Illuminate\Support\Str::slug($menu->name);
+                $menu->slug = Str::slug($menu->name);
             }
         });
     }

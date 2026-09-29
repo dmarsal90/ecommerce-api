@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\OrderResource\Pages;
 
 use App\Filament\Resources\OrderResource;
-use Filament\Resources\Pages\ViewRecord;
 use Filament\Pages\PageConfiguration;
+use Filament\Resources\Pages\ViewRecord;
 
 class ViewOrder extends ViewRecord
 {
@@ -15,7 +15,7 @@ class ViewOrder extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            OrderResource\Pages\EditOrder::make(),
+            EditOrder::make(),
         ];
     }
 }

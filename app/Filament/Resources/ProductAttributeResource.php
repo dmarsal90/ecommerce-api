@@ -3,18 +3,18 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductAttributeResource\Pages;
-use App\Models\ProductAttribute;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Schema;
 use App\Filament\Resources\ProductAttributeResource\RelationManagers\ValuesRelationManager;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
+use App\Models\ProductAttribute;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Actions\DeleteAction;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
+use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Support\Str;
 
 class ProductAttributeResource extends Resource
@@ -24,6 +24,7 @@ class ProductAttributeResource extends Resource
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-swatch';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Catalog';
+
     public static function form(Schema $schema): Schema
     {
         return $schema

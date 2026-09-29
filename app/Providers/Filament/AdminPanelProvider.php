@@ -2,10 +2,11 @@
 
 namespace App\Providers\Filament;
 
-use App\Filament\Widgets\StatsOverview;
-use App\Filament\Widgets\SalesChart;
-use App\Filament\Widgets\RecentOrders;
+use App\Filament\Pages\Dashboard;
 use App\Filament\Widgets\LowStock;
+use App\Filament\Widgets\RecentOrders;
+use App\Filament\Widgets\SalesChart;
+use App\Filament\Widgets\StatsOverview;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\FileUpload;
@@ -15,7 +16,7 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use App\Filament\Pages\Dashboard;
+use Filament\Notifications\Notification;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Schemas\Components\Tabs;
@@ -28,7 +29,6 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-use MatondoJK\FilamentAvatarPicker\Components\AvatarPicker;
 use Xplodman\CountUp\CountUpPlugin;
 
 class AdminPanelProvider extends PanelProvider
@@ -97,7 +97,7 @@ class AdminPanelProvider extends PanelProvider
                                             ->directory('custom-avatars')
                                             ->placeholder('Drag and drop or click to upload')
                                             ->extraAttributes([
-                                                'x-on:filepond-processfile' => "setTimeout(() => \$el.closest('.fi-modal').querySelector('button[type=\"submit\"]').click(), 300)"
+                                                'x-on:filepond-processfile' => "setTimeout(() => \$el.closest('.fi-modal').querySelector('button[type=\"submit\"]').click(), 300)",
                                             ]),
                                     ]),
                             ]),
@@ -113,7 +113,7 @@ class AdminPanelProvider extends PanelProvider
                         }
                         $user->save();
 
-                        \Filament\Notifications\Notification::make()
+                        Notification::make()
                             ->title('Avatar updated successfully')
                             ->success()
                             ->send();
@@ -150,7 +150,7 @@ class AdminPanelProvider extends PanelProvider
                         $user->password = $data['password'];
                         $user->save();
 
-                        \Filament\Notifications\Notification::make()
+                        Notification::make()
                             ->title('Password updated successfully')
                             ->success()
                             ->send();

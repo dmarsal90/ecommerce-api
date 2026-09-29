@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\ProductAttributeResource\Pages;
 
 use App\Filament\Resources\ProductAttributeResource;
-use Filament\Resources\Pages\ViewRecord;
 use Filament\Pages\PageConfiguration;
+use Filament\Resources\Pages\ViewRecord;
 
 class ViewProductAttribute extends ViewRecord
 {
@@ -15,7 +15,7 @@ class ViewProductAttribute extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            ProductAttributeResource\Pages\EditProductAttribute::make(),
+            EditProductAttribute::make(),
         ];
     }
 }

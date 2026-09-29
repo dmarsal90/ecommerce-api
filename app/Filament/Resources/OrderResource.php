@@ -4,17 +4,17 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\OrderResource\Pages;
 use App\Models\Order;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Schemas\Schema;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Actions\DeleteAction;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
+use Filament\Tables;
+use Filament\Tables\Table;
 
 class OrderResource extends Resource
 {
@@ -23,6 +23,7 @@ class OrderResource extends Resource
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-shopping-cart';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Sales';
+
     public static function form(Schema $schema): Schema
     {
         return $schema

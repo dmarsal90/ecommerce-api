@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\PageResource\Pages;
 
 use App\Filament\Resources\PageResource;
-use Filament\Resources\Pages\ViewRecord;
 use Filament\Pages\PageConfiguration;
+use Filament\Resources\Pages\ViewRecord;
 
 class ViewPage extends ViewRecord
 {
@@ -15,7 +15,7 @@ class ViewPage extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            PageResource\Pages\EditPage::make(),
+            EditPage::make(),
         ];
     }
 }

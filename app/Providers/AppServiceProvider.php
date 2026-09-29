@@ -12,7 +12,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->loadTranslationsFrom(
-            __DIR__ . '/../../vendor/filament/forms/resources/lang',
+            __DIR__.'/../../vendor/filament/forms/resources/lang',
             'filament-forms'
         );
     }

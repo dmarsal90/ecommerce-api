@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\PageResource\Pages;
 
 use App\Filament\Resources\PageResource;
-use Filament\Resources\Pages\EditRecord;
 use Filament\Pages\PageConfiguration;
+use Filament\Resources\Pages\EditRecord;
 
 class EditPage extends EditRecord
 {

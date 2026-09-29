@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\MenuItemResource\Pages;
 
 use App\Filament\Resources\MenuItemResource;
-use Filament\Resources\Pages\ViewRecord;
 use Filament\Pages\PageConfiguration;
+use Filament\Resources\Pages\ViewRecord;
 
 class ViewMenuItem extends ViewRecord
 {
@@ -15,7 +15,7 @@ class ViewMenuItem extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            MenuItemResource\Pages\EditMenuItem::make(),
+            EditMenuItem::make(),
         ];
     }
 }

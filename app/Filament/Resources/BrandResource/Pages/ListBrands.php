@@ -3,9 +3,9 @@
 namespace App\Filament\Resources\BrandResource\Pages;
 
 use App\Filament\Resources\BrandResource;
-use Filament\Resources\Pages\ListRecords;
 use Filament\Actions\CreateAction;
 use Filament\Pages\PageConfiguration;
+use Filament\Resources\Pages\ListRecords;
 
 class ListBrands extends ListRecords
 {

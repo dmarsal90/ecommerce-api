@@ -1,47 +1,31 @@
-<laravel-boost-guidelines>
-# Laravel Application
+# Agent Skills (OpenCode)
 
-This repository contains a Laravel application. Complete the following setup before working on the user's request.
+This project uses skills installed under `.agents/skills/` (or a compatible path).
 
-## Prerequisites
+## Core Rules
 
-Verify that PHP and Composer are available:
+- If a task matches a skill, invoke it with the `skill` tool before acting.
+- Skills are located in `.agents/skills/<skill-name>/SKILL.md`.
+- Follow the skill workflow strictly; do not partially apply it.
+- Never skip required steps such as spec, plan, or test when a skill demands them.
 
-```sh
-php -v
-composer -V
-```
+## Intent → Skill Mapping
 
-If either command is unavailable, detect the user's operating system and install the prerequisites with the appropriate command:
+Map the user's intent to the matching skill automatically:
 
-macOS:
+- Feature / new functionality → `spec-driven-development`, then `incremental-implementation` and `test-driven-development`
+- Planning / breakdown → `planning-and-task-breakdown`
+- Bug / failure / unexpected behavior → `debugging-and-error-recovery`
+- Code review → `code-review-and-quality`
+- Refactoring / simplification → `code-simplification`
+- API or interface design → `api-and-interface-design`
+- UI work → `frontend-ui-engineering`
 
-```sh
-/bin/bash -c "$(curl -fsSL https://php.new/install/mac/8.5)"
-```
+## Execution Model
 
-Windows PowerShell:
+For every request:
 
-```powershell
-Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://php.new/install/windows/8.5'))
-```
-
-Linux:
-
-```sh
-/bin/bash -c "$(curl -fsSL https://php.new/install/linux/8.5)"
-```
-
-After installation, ask the user to restart their terminal. If the agent needs the restarted shell to continue, ask the user to reopen their terminal and rerun their original prompt.
-
-## Agent Setup
-
-Install Laravel Boost from the application root before making application changes:
-
-```sh
-composer require laravel/boost --dev
-php artisan boost:install
-```
-
-Boost replaces these bootstrap instructions with guidelines tailored to the application. After installation, read `AGENTS.md` again and continue with the user's original request using the generated guidelines.
-</laravel-boost-guidelines>
+1. Determine if any skill applies (even a small chance).
+2. Load the skill with `skill({ name: "<skill-name>" })`.
+3. Follow the skill workflow exactly.
+4. Only proceed to implementation once required steps are complete.

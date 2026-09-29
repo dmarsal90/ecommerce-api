@@ -3,67 +3,68 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\ProductFilterRequest;
+use App\Http\Resources\Api\ProductResource;
 use App\Models\Product;
-use App\Models\Category;
-use App\Models\Brand;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
 class ProductController extends Controller
 {
-    public function index(Request $request): JsonResponse
+    public function index(ProductFilterRequest $request): JsonResponse
     {
+        $validated = $request->validated();
+
         $query = Product::with(['category', 'brand', 'images', 'variants.attributeValues.attribute'])
             ->where('is_active', true);
 
         // Filters
-        if ($request->has('category')) {
-            $query->whereHas('category', function ($q) use ($request) {
-                $q->where('slug', $request->category);
+        if ($validated['category'] ?? null) {
+            $query->whereHas('category', function ($q) use ($validated) {
+                $q->where('slug', $validated['category']);
             });
         }
 
-        if ($request->has('brand')) {
-            $query->whereHas('brand', function ($q) use ($request) {
-                $q->where('slug', $request->brand);
+        if ($validated['brand'] ?? null) {
+            $query->whereHas('brand', function ($q) use ($validated) {
+                $q->where('slug', $validated['brand']);
             });
         }
 
-        if ($request->has('gender')) {
-            $query->where('gender', $request->gender);
+        if ($validated['gender'] ?? null) {
+            $query->where('gender', $validated['gender']);
         }
 
-        if ($request->has('season')) {
-            $query->where('season', $request->season);
+        if ($validated['season'] ?? null) {
+            $query->where('season', $validated['season']);
         }
 
-        if ($request->has('featured')) {
+        if ($validated['featured'] ?? false) {
             $query->where('is_featured', true);
         }
 
-        if ($request->has('on_sale')) {
+        if ($validated['on_sale'] ?? false) {
             $query->whereNotNull('compare_at_price')
                 ->whereColumn('price', '<', 'compare_at_price');
         }
 
-        if ($request->has('min_price')) {
-            $query->where('price', '>=', $request->min_price);
+        if ($validated['min_price'] ?? null) {
+            $query->where('price', '>=', $validated['min_price']);
         }
 
-        if ($request->has('max_price')) {
-            $query->where('price', '<=', $request->max_price);
+        if ($validated['max_price'] ?? null) {
+            $query->where('price', '<=', $validated['max_price']);
         }
 
-        if ($request->has('search')) {
-            $query->where(function ($q) use ($request) {
-                $q->where('name', 'like', "%{$request->search}%")
-                    ->orWhere('description', 'like', "%{$request->search}%")
-                    ->orWhere('short_description', 'like', "%{$request->search}%");
+        if ($validated['search'] ?? null) {
+            $query->where(function ($q) use ($validated) {
+                $q->where('name', 'like', "%{$validated['search']}%")
+                    ->orWhere('description', 'like', "%{$validated['search']}%")
+                    ->orWhere('short_description', 'like', "%{$validated['search']}%");
             });
         }
 
         // Sorting
-        $sort = $request->get('sort', 'newest');
+        $sort = $validated['sort'] ?? 'newest';
         switch ($sort) {
             case 'price_asc':
                 $query->orderBy('price', 'asc');
@@ -87,11 +88,11 @@ class ProductController extends Controller
         }
 
         // Pagination
-        $perPage = min($request->get('per_page', 20), 100);
+        $perPage = $validated['per_page'] ?? 20;
         $products = $query->paginate($perPage);
 
         return response()->json([
-            'data' => $products->items(),
+            'data' => ProductResource::collection($products)->resolve(),
             'meta' => [
                 'current_page' => $products->currentPage(),
                 'last_page' => $products->lastPage(),
@@ -118,12 +119,10 @@ class ProductController extends Controller
             'tags',
             'reviews' => function ($q) {
                 $q->where('status', 'approved')->with('user')->latest();
-            }
+            },
         ])->where('slug', $slug)->where('is_active', true)->firstOrFail();
 
-        return response()->json([
-            'data' => $product,
-        ]);
+        return (new ProductResource($product))->response();
     }
 
     public function featured(): JsonResponse
@@ -135,7 +134,7 @@ class ProductController extends Controller
             ->limit(8)
             ->get();
 
-        return response()->json(['data' => $products]);
+        return ProductResource::collection($products)->response();
     }
 
     public function newArrivals(): JsonResponse
@@ -146,7 +145,7 @@ class ProductController extends Controller
             ->limit(8)
             ->get();
 
-        return response()->json(['data' => $products]);
+        return ProductResource::collection($products)->response();
     }
 
     public function onSale(): JsonResponse
@@ -159,11 +158,13 @@ class ProductController extends Controller
             ->limit(8)
             ->get();
 
-        return response()->json(['data' => $products]);
+        return ProductResource::collection($products)->response();
     }
 
-    public function related(Product $product): JsonResponse
+    public function related(string $slug): JsonResponse
     {
+        $product = Product::where('slug', $slug)->where('is_active', true)->firstOrFail();
+
         $products = Product::with(['category', 'brand', 'images'])
             ->where('is_active', true)
             ->where('id', '!=', $product->id)
@@ -175,6 +176,6 @@ class ProductController extends Controller
             ->limit(4)
             ->get();
 
-        return response()->json(['data' => $products]);
+        return ProductResource::collection($products)->response();
     }
 }

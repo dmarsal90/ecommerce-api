@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\InventoryResource\Pages;
 
 use App\Filament\Resources\InventoryResource;
-use Filament\Resources\Pages\ViewRecord;
 use Filament\Pages\PageConfiguration;
+use Filament\Resources\Pages\ViewRecord;
 
 class ViewInventory extends ViewRecord
 {
@@ -15,7 +15,7 @@ class ViewInventory extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            InventoryResource\Pages\EditInventory::make(),
+            EditInventory::make(),
         ];
     }
 }

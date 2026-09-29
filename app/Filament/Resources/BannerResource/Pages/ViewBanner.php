@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\BannerResource\Pages;
 
 use App\Filament\Resources\BannerResource;
-use Filament\Resources\Pages\ViewRecord;
 use Filament\Pages\PageConfiguration;
+use Filament\Resources\Pages\ViewRecord;
 
 class ViewBanner extends ViewRecord
 {
@@ -15,7 +15,7 @@ class ViewBanner extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            BannerResource\Pages\EditBanner::make(),
+            EditBanner::make(),
         ];
     }
 }

@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\ReviewResource\Pages;
 
 use App\Filament\Resources\ReviewResource;
-use Filament\Resources\Pages\CreateRecord;
 use Filament\Pages\PageConfiguration;
+use Filament\Resources\Pages\CreateRecord;
 
 class CreateReview extends CreateRecord
 {

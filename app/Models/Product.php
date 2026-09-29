@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -10,6 +11,8 @@ use Illuminate\Support\Str;
 
 class Product extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'name',
         'slug',
@@ -96,7 +99,7 @@ class Product extends Model
                 $product->slug = Str::slug($product->name);
             }
             if (empty($product->sku)) {
-                $product->sku = 'SKU-' . strtoupper(Str::random(8));
+                $product->sku = 'SKU-'.strtoupper(Str::random(8));
             }
         });
 
@@ -139,9 +142,10 @@ class Product extends Model
 
     public function getInStockAttribute(): bool
     {
-        if (!$this->track_quantity) {
+        if (! $this->track_quantity) {
             return true;
         }
+
         return $this->quantity > 0;
     }
 
@@ -155,6 +159,7 @@ class Product extends Model
         if ($this->hasVariants) {
             return $this->variants()->min('price') ?? $this->price;
         }
+
         return $this->price;
     }
 
@@ -163,6 +168,7 @@ class Product extends Model
         if ($this->hasVariants) {
             return $this->variants()->max('price') ?? $this->price;
         }
+
         return $this->price;
     }
 }

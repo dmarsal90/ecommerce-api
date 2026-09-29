@@ -3,23 +3,24 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\LoginRequest;
+use App\Http\Requests\Api\RegisterRequest;
+use App\Http\Requests\Api\StoreAddressRequest;
+use App\Http\Requests\Api\UpdateAddressRequest;
+use App\Http\Requests\Api\UpdateProfileRequest;
+use App\Http\Resources\Api\AddressResource;
+use App\Http\Resources\Api\UserResource;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-    public function register(Request $request): JsonResponse
+    public function register(RegisterRequest $request): JsonResponse
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
-
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
@@ -30,20 +31,14 @@ class AuthController extends Controller
         $token = $user->createToken('api-token')->plainTextToken;
 
         return response()->json([
-            'user' => $user,
+            'user' => (new UserResource($user))->resolve(),
             'token' => $token,
         ], 201);
     }
 
-    public function login(Request $request): JsonResponse
+    public function login(LoginRequest $request): JsonResponse
     {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-            'remember' => 'boolean',
-        ]);
-
-        if (!Auth::attempt($request->only('email', 'password'), $request->boolean('remember'))) {
+        if (! Auth::attempt($request->only('email', 'password'), $request->boolean('remember'))) {
             throw ValidationException::withMessages([
                 'email' => ['The provided credentials are incorrect.'],
             ]);
@@ -53,7 +48,7 @@ class AuthController extends Controller
         $token = $user->createToken('api-token')->plainTextToken;
 
         return response()->json([
-            'user' => $user,
+            'user' => (new UserResource($user))->resolve(),
             'token' => $token,
         ]);
     }
@@ -70,68 +65,45 @@ class AuthController extends Controller
     public function me(Request $request): JsonResponse
     {
         return response()->json([
-            'user' => $request->user()->load('addresses'),
+            'user' => (new UserResource($request->user()->load('addresses')))->resolve(),
         ]);
     }
 
-    public function update(Request $request): JsonResponse
+    public function update(UpdateProfileRequest $request): JsonResponse
     {
-        $request->validate([
-            'name' => 'sometimes|string|max:255',
-            'email' => 'sometimes|string|email|max:255|unique:users,email,' . $request->user()->id,
-            'password' => 'sometimes|string|min:8|confirmed',
-        ]);
-
         $user = $request->user();
 
-        if ($request->has('name')) {
-            $user->name = $request->name;
-        }
-
         if ($request->has('email')) {
-            $user->email = $request->email;
+            if (! Hash::check($request->current_password, $user->password)) {
+                return response()->json([
+                    'message' => 'Current password is incorrect',
+                    'errors' => ['current_password' => ['The provided password does not match your current password.']],
+                ], 422);
+            }
             $user->email_verified_at = null;
         }
 
-        if ($request->has('password')) {
-            $user->password = Hash::make($request->password);
-        }
-
+        $user->fill($request->only(['name', 'email', 'password']));
         $user->save();
 
         return response()->json([
-            'user' => $user,
+            'user' => (new UserResource($user))->resolve(),
         ]);
     }
 
     public function addresses(Request $request): JsonResponse
     {
         $user = $request->user();
-        
+
         $addresses = $user->addresses()
             ->orderByDesc('is_default')
             ->get();
 
-        return response()->json(['data' => $addresses]);
+        return AddressResource::collection($addresses)->response();
     }
 
-    public function storeAddress(Request $request): JsonResponse
+    public function storeAddress(StoreAddressRequest $request): JsonResponse
     {
-        $request->validate([
-            'type' => 'required|in:billing,shipping',
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'company' => 'nullable|string|max:255',
-            'address_line_1' => 'required|string|max:255',
-            'address_line_2' => 'nullable|string|max:255',
-            'city' => 'required|string|max:255',
-            'state' => 'required|string|max:255',
-            'postal_code' => 'required|string|max:20',
-            'country' => 'required|string|max:2',
-            'phone' => 'nullable|string|max:20',
-            'is_default' => 'boolean',
-        ]);
-
         $user = $request->user();
 
         if ($request->boolean('is_default')) {
@@ -140,30 +112,15 @@ class AuthController extends Controller
                 ->update(['is_default' => false]);
         }
 
-        $address = $user->addresses()->create($request->all());
+        $address = $user->addresses()->create($request->validated());
 
-        return response()->json(['data' => $address], 201);
+        return (new AddressResource($address))->response()->setStatusCode(201);
     }
 
-    public function updateAddress(Request $request, int $id): JsonResponse
+    public function updateAddress(UpdateAddressRequest $request, int $id): JsonResponse
     {
         $user = $request->user();
         $address = $user->addresses()->findOrFail($id);
-
-        $request->validate([
-            'type' => 'sometimes|in:billing,shipping',
-            'first_name' => 'sometimes|string|max:255',
-            'last_name' => 'sometimes|string|max:255',
-            'company' => 'nullable|string|max:255',
-            'address_line_1' => 'sometimes|string|max:255',
-            'address_line_2' => 'nullable|string|max:255',
-            'city' => 'sometimes|string|max:255',
-            'state' => 'sometimes|string|max:255',
-            'postal_code' => 'sometimes|string|max:20',
-            'country' => 'sometimes|string|max:2',
-            'phone' => 'nullable|string|max:20',
-            'is_default' => 'boolean',
-        ]);
 
         if ($request->boolean('is_default')) {
             $user->addresses()
@@ -172,9 +129,9 @@ class AuthController extends Controller
                 ->update(['is_default' => false]);
         }
 
-        $address->update($request->all());
+        $address->update($request->validated());
 
-        return response()->json(['data' => $address]);
+        return (new AddressResource($address))->response();
     }
 
     public function deleteAddress(int $id): JsonResponse

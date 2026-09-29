@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\HomepageBlockResource\Pages;
 
 use App\Filament\Resources\HomepageBlockResource;
-use Filament\Resources\Pages\ViewRecord;
 use Filament\Pages\PageConfiguration;
+use Filament\Resources\Pages\ViewRecord;
 
 class ViewHomepageBlock extends ViewRecord
 {
@@ -15,7 +15,7 @@ class ViewHomepageBlock extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            HomepageBlockResource\Pages\EditHomepageBlock::make(),
+            EditHomepageBlock::make(),
         ];
     }
 }

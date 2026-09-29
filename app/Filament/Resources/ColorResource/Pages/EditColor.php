@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\ColorResource\Pages;
 
 use App\Filament\Resources\ColorResource;
-use Filament\Resources\Pages\EditRecord;
 use Filament\Pages\PageConfiguration;
+use Filament\Resources\Pages\EditRecord;
 
 class EditColor extends EditRecord
 {

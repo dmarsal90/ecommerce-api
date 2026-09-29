@@ -60,9 +60,10 @@ class Inventory extends Model
 
     public function getInStockAttribute(): bool
     {
-        if (!$this->track_quantity) {
+        if (! $this->track_quantity) {
             return true;
         }
+
         return $this->available > 0;
     }
 }

@@ -3,9 +3,9 @@
 namespace App\Filament\Resources\ProductAttributeResource\Pages;
 
 use App\Filament\Resources\ProductAttributeResource;
-use Filament\Resources\Pages\ListRecords;
 use Filament\Actions\CreateAction;
 use Filament\Pages\PageConfiguration;
+use Filament\Resources\Pages\ListRecords;
 
 class ListProductAttributes extends ListRecords
 {

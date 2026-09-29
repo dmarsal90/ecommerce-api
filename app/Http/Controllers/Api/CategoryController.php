@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Api\CategoryResource;
+use App\Http\Resources\Api\ProductResource;
 use App\Models\Category;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
@@ -16,9 +19,10 @@ class CategoryController extends Controller
             ->where('is_active', true)
             ->whereNull('parent_id')
             ->orderBy('sort_order')
+            ->withCount('products')
             ->get();
 
-        return response()->json(['data' => $categories]);
+        return CategoryResource::collection($categories)->response();
     }
 
     public function show(string $slug): JsonResponse
@@ -30,16 +34,16 @@ class CategoryController extends Controller
             },
             'products' => function ($q) {
                 $q->where('is_active', true)->with(['category', 'brand', 'images'])->latest()->paginate(20);
-            }
+            },
         ])->where('slug', $slug)->where('is_active', true)->firstOrFail();
 
-        return response()->json(['data' => $category]);
+        return (new CategoryResource($category))->response();
     }
 
-    public function products(string $slug, \Illuminate\Http\Request $request): JsonResponse
+    public function products(string $slug, Request $request): JsonResponse
     {
         $category = Category::where('slug', $slug)->where('is_active', true)->firstOrFail();
-        
+
         $query = $category->products()
             ->with(['category', 'brand', 'images'])
             ->where('is_active', true);
@@ -71,14 +75,14 @@ class CategoryController extends Controller
         $products = $query->paginate($perPage);
 
         return response()->json([
-            'data' => $products->items(),
+            'data' => ProductResource::collection($products)->resolve(),
             'meta' => [
                 'current_page' => $products->currentPage(),
                 'last_page' => $products->lastPage(),
                 'per_page' => $products->perPage(),
                 'total' => $products->total(),
             ],
-            'category' => $category,
+            'category' => new CategoryResource($category)->resolve(),
         ]);
     }
 
@@ -86,9 +90,26 @@ class CategoryController extends Controller
     {
         $categories = Category::where('is_active', true)
             ->orderBy('sort_order')
-            ->get()
-            ->toTree();
+            ->get();
 
-        return response()->json(['data' => $categories]);
+        $tree = $this->buildTree($categories);
+
+        return CategoryResource::collection($tree)->response();
+    }
+
+    private function buildTree($categories, $parentId = null)
+    {
+        $tree = [];
+        foreach ($categories as $category) {
+            if ($category->parent_id == $parentId) {
+                $children = $this->buildTree($categories, $category->id);
+                if (! empty($children)) {
+                    $category->setRelation('children', collect($children));
+                }
+                $tree[] = $category;
+            }
+        }
+
+        return $tree;
     }
 }

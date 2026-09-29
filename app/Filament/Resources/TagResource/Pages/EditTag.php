@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\TagResource\Pages;
 
 use App\Filament\Resources\TagResource;
-use Filament\Resources\Pages\EditRecord;
 use Filament\Pages\PageConfiguration;
+use Filament\Resources\Pages\EditRecord;
 
 class EditTag extends EditRecord
 {

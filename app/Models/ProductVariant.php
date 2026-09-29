@@ -2,14 +2,17 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class ProductVariant extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'product_id',
         'sku',
@@ -68,9 +71,10 @@ class ProductVariant extends Model
 
     public function getInStockAttribute(): bool
     {
-        if (!$this->track_quantity) {
+        if (! $this->track_quantity) {
             return true;
         }
+
         return $this->quantity > 0;
     }
 

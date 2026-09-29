@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\SizeGroupResource\Pages;
 
 use App\Filament\Resources\SizeGroupResource;
-use Filament\Resources\Pages\EditRecord;
 use Filament\Pages\PageConfiguration;
+use Filament\Resources\Pages\EditRecord;
 
 class EditSizeGroup extends EditRecord
 {

@@ -30,8 +30,8 @@ class StatsOverview extends BaseWidget
             ->count();
 
         return [
-            Stat::make('Sales Today', '$' . number_format($salesToday, 2))
-                ->description('Orders: ' . $ordersToday)
+            Stat::make('Sales Today', '$'.number_format($salesToday, 2))
+                ->description('Orders: '.$ordersToday)
                 ->color('success')
                 ->chart([12, 19, 3, 5, 2, 3, 8, 12, 15, 18, 20, 25]),
 

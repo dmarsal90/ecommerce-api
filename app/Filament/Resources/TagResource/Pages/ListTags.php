@@ -3,9 +3,9 @@
 namespace App\Filament\Resources\TagResource\Pages;
 
 use App\Filament\Resources\TagResource;
-use Filament\Resources\Pages\ListRecords;
 use Filament\Actions\CreateAction;
 use Filament\Pages\PageConfiguration;
+use Filament\Resources\Pages\ListRecords;
 
 class ListTags extends ListRecords
 {

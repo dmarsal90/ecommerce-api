@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\MenuResource\Pages;
 
 use App\Filament\Resources\MenuResource;
-use Filament\Resources\Pages\EditRecord;
 use Filament\Pages\PageConfiguration;
+use Filament\Resources\Pages\EditRecord;
 
 class EditMenu extends EditRecord
 {

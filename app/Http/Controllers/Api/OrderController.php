@@ -3,14 +3,15 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\StoreOrderRequest;
+use App\Http\Resources\Api\OrderResource;
 use App\Models\Order;
 use App\Models\OrderAddress;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use App\Models\Inventory;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -20,7 +21,7 @@ class OrderController extends Controller
     public function index(Request $request): JsonResponse
     {
         $user = Auth::user();
-        
+
         $query = Order::with(['items.product.images', 'items.variant.attributeValues.attribute', 'addresses'])
             ->where('user_id', $user->id)
             ->orderBy('created_at', 'desc');
@@ -33,7 +34,7 @@ class OrderController extends Controller
         $orders = $query->paginate($perPage);
 
         return response()->json([
-            'data' => $orders->items(),
+            'data' => OrderResource::collection($orders)->resolve(),
             'meta' => [
                 'current_page' => $orders->currentPage(),
                 'last_page' => $orders->lastPage(),
@@ -46,112 +47,116 @@ class OrderController extends Controller
     public function show(string $orderNumber): JsonResponse
     {
         $user = Auth::user();
-        
+
         $order = Order::with([
             'items.product.images',
             'items.variant.attributeValues.attribute',
-            'addresses'
+            'addresses',
         ])->where('user_id', $user->id)
             ->where('order_number', $orderNumber)
             ->firstOrFail();
 
-        return response()->json(['data' => $order]);
+        return (new OrderResource($order))->response();
     }
 
-    public function store(Request $request): JsonResponse
+    public function store(StoreOrderRequest $request): JsonResponse
     {
-        $request->validate([
-            'items' => 'required|array|min:1',
-            'items.*.product_id' => 'required|exists:products,id',
-            'items.*.variant_id' => 'nullable|exists:product_variants,id',
-            'items.*.quantity' => 'required|integer|min:1|max:99',
-            'shipping_address' => 'required|array',
-            'shipping_address.first_name' => 'required|string|max:255',
-            'shipping_address.last_name' => 'required|string|max:255',
-            'shipping_address.address_line_1' => 'required|string|max:255',
-            'shipping_address.address_line_2' => 'nullable|string|max:255',
-            'shipping_address.city' => 'required|string|max:255',
-            'shipping_address.state' => 'required|string|max:255',
-            'shipping_address.postal_code' => 'required|string|max:20',
-            'shipping_address.country' => 'required|string|max:2',
-            'shipping_address.phone' => 'nullable|string|max:20',
-            'billing_address' => 'nullable|array',
-            'billing_address.first_name' => 'required|string|max:255',
-            'billing_address.last_name' => 'required|string|max:255',
-            'billing_address.address_line_1' => 'required|string|max:255',
-            'billing_address.address_line_2' => 'nullable|string|max:255',
-            'billing_address.city' => 'required|string|max:255',
-            'billing_address.state' => 'required|string|max:255',
-            'billing_address.postal_code' => 'required|string|max:20',
-            'billing_address.country' => 'required|string|max:2',
-            'billing_address.phone' => 'nullable|string|max:20',
-            'payment_method' => 'required|string',
-            'notes' => 'nullable|string',
-        ]);
+        $validated = $request->validated();
 
         $user = Auth::user();
 
-        return DB::transaction(function () use ($request, $user) {
-            $items = [];
-            $subtotal = 0;
+        // Validate stock and prepare items before transaction
+        $items = [];
+        $subtotal = 0;
 
-            // Validate stock and prepare items
-            foreach ($request->items as $itemData) {
-                $product = Product::findOrFail($itemData['product_id']);
-                $variant = isset($itemData['variant_id']) ? ProductVariant::findOrFail($itemData['variant_id']) : null;
+        foreach ($validated['items'] as $itemData) {
+            $product = Product::findOrFail($itemData['product_id']);
+            $variant = isset($itemData['variant_id']) ? ProductVariant::findOrFail($itemData['variant_id']) : null;
 
-                if (!$product->is_active || ($variant && !$variant->is_active)) {
-                    throw new \Exception('Product or variant is not available');
-                }
-
-                $quantity = $itemData['quantity'];
-                
-                // Check stock
-                if ($variant) {
-                    $available = $variant->inventory?->available ?? $variant->quantity;
-                    if ($variant->track_quantity && $available < $quantity) {
-                        throw new \Exception("Not enough stock for {$product->name} ({$variant->sku}). Available: {$available}");
-                    }
-                    $price = $variant->price;
-                    $sku = $variant->sku;
-                    $variantName = $variant->sku;
-                } else {
-                    $available = $product->inventory?->available ?? $product->quantity;
-                    if ($product->track_quantity && $available < $quantity) {
-                        throw new \Exception("Not enough stock for {$product->name}. Available: {$available}");
-                    }
-                    $price = $product->price;
-                    $sku = $product->sku;
-                    $variantName = null;
-                }
-
-                $total = $price * $quantity;
-                $subtotal += $total;
-
-                $items[] = [
-                    'product_id' => $product->id,
-                    'variant_id' => $variant?->id,
-                    'quantity' => $quantity,
-                    'price' => $price,
-                    'compare_at_price' => $variant?->compare_at_price ?? $product->compare_at_price,
-                    'total' => $total,
-                    'product_name' => $product->name,
-                    'variant_name' => $variantName,
-                    'sku' => $sku,
-                ];
+            if (! $product->is_active || ($variant && ! $variant->is_active)) {
+                return response()->json([
+                    'message' => 'Product or variant is not available',
+                ], 422);
             }
 
-            $tax = round($subtotal * 0.08, 2);
-            $shipping = $subtotal > 50 ? 0 : 9.99;
-            $discount = 0;
-            $total = $subtotal + $tax + $shipping - $discount;
+            $quantity = $itemData['quantity'];
 
+            // Check stock with lock
+            $available = DB::transaction(function () use ($product, $variant, $quantity) {
+                if ($variant) {
+                    $lockedVariant = ProductVariant::where('id', $variant->id)
+                        ->lockForUpdate()
+                        ->first();
+                    $avail = $lockedVariant->inventory?->available ?? $lockedVariant->quantity;
+                    if ($lockedVariant->track_quantity && $avail < $quantity) {
+                        return response()->json([
+                            'message' => 'Not enough stock available',
+                            'available' => $avail,
+                        ], 422);
+                    }
+
+                    return $avail;
+                }
+                $lockedProduct = Product::where('id', $product->id)
+                    ->lockForUpdate()
+                    ->first();
+                $avail = $lockedProduct->inventory?->available ?? $lockedProduct->quantity;
+                if ($lockedProduct->track_quantity && $avail < $quantity) {
+                    return response()->json([
+                        'message' => 'Not enough stock available',
+                        'available' => $avail,
+                    ], 422);
+                }
+
+                return $avail;
+            });
+
+            if ($available instanceof JsonResponse) {
+                return $available;
+            }
+
+            if ($variant) {
+                $price = $variant->price;
+                $sku = $variant->sku;
+                $variantName = $variant->sku;
+            } else {
+                $price = $product->price;
+                $sku = $product->sku;
+                $variantName = null;
+            }
+
+            $total = $price * $quantity;
+            $subtotal += $total;
+
+            $items[] = [
+                'product_id' => $product->id,
+                'variant_id' => $variant?->id,
+                'quantity' => $quantity,
+                'price' => $price,
+                'compare_at_price' => $variant?->compare_at_price ?? $product->compare_at_price,
+                'total' => $total,
+                'product_name' => $product->name,
+                'variant_name' => $variantName,
+                'sku' => $sku,
+            ];
+        }
+
+        $taxRate = config('shop.tax_rate', 0.08);
+        $freeShippingThreshold = config('shop.free_shipping_threshold', 50);
+        $shippingCost = config('shop.shipping_cost', 9.99);
+
+        $tax = round($subtotal * $taxRate, 2);
+        $shipping = $subtotal > $freeShippingThreshold ? 0 : $shippingCost;
+        $discount = 0;
+        $total = $subtotal + $tax + $shipping - $discount;
+
+        return DB::transaction(function () use ($user, $validated, $items, $subtotal, $tax, $shipping, $discount, $total) {
             // Create order
             $order = Order::create([
                 'user_id' => $user->id,
-                'order_number' => 'ORD-' . strtoupper(Str::random(8)),
+                'order_number' => 'ORD-'.strtoupper(Str::random(8)),
                 'email' => $user->email,
-                'phone' => $request->shipping_address['phone'] ?? null,
+                'phone' => $validated['shipping_address']['phone'] ?? null,
                 'status' => 'pending',
                 'payment_status' => 'pending',
                 'fulfillment_status' => 'unfulfilled',
@@ -160,9 +165,9 @@ class OrderController extends Controller
                 'shipping' => $shipping,
                 'discount' => $discount,
                 'total' => $total,
-                'currency' => 'USD',
-                'payment_method' => $request->payment_method,
-                'notes' => $request->notes,
+                'currency' => config('shop.currency', 'USD'),
+                'payment_method' => $validated['payment_method'],
+                'notes' => $validated['notes'] ?? null,
             ]);
 
             // Create order items
@@ -171,28 +176,32 @@ class OrderController extends Controller
             }
 
             // Create shipping address
-            OrderAddress::create(array_merge($request->shipping_address, [
+            OrderAddress::create(array_merge($validated['shipping_address'], [
                 'order_id' => $order->id,
                 'type' => 'shipping',
             ]));
 
             // Create billing address
-            $billingAddress = $request->billing_address ?? $request->shipping_address;
+            $billingAddress = $validated['billing_address'] ?? $validated['shipping_address'];
             OrderAddress::create(array_merge($billingAddress, [
                 'order_id' => $order->id,
                 'type' => 'billing',
             ]));
 
-            // Decrease stock
+            // Decrease stock with locks
             foreach ($items as $item) {
                 if ($item['variant_id']) {
-                    $variant = ProductVariant::find($item['variant_id']);
+                    $variant = ProductVariant::where('id', $item['variant_id'])
+                        ->lockForUpdate()
+                        ->first();
                     if ($variant && $variant->track_quantity) {
                         $variant->decrement('quantity', $item['quantity']);
                         $variant->inventory?->decrement('available', $item['quantity']);
                     }
                 } else {
-                    $product = Product::find($item['product_id']);
+                    $product = Product::where('id', $item['product_id'])
+                        ->lockForUpdate()
+                        ->first();
                     if ($product && $product->track_quantity) {
                         $product->decrement('quantity', $item['quantity']);
                         $product->inventory?->decrement('available', $item['quantity']);
@@ -205,7 +214,7 @@ class OrderController extends Controller
 
             return response()->json([
                 'message' => 'Order created successfully',
-                'data' => $order->load(['items.product.images', 'items.variant.attributeValues.attribute', 'addresses']),
+                'data' => (new OrderResource($order->load(['items.product.images', 'items.variant.attributeValues.attribute', 'addresses'])))->resolve(),
             ], 201);
         });
     }
@@ -213,14 +222,20 @@ class OrderController extends Controller
     public function cancel(string $orderNumber): JsonResponse
     {
         $user = Auth::user();
-        
+
         $order = Order::where('user_id', $user->id)
             ->where('order_number', $orderNumber)
             ->firstOrFail();
 
-        if (!in_array($order->status, ['pending', 'processing'])) {
+        if (! in_array($order->status, ['pending', 'processing'])) {
             return response()->json([
                 'message' => 'Order cannot be cancelled',
+            ], 422);
+        }
+
+        if ($order->status === 'cancelled') {
+            return response()->json([
+                'message' => 'Order is already cancelled',
             ], 422);
         }
 
@@ -229,16 +244,20 @@ class OrderController extends Controller
             'cancelled_at' => now(),
         ]);
 
-        // Restore stock
+        // Restore stock with locks
         foreach ($order->items as $item) {
             if ($item->variant_id) {
-                $variant = ProductVariant::find($item->variant_id);
+                $variant = ProductVariant::where('id', $item->variant_id)
+                    ->lockForUpdate()
+                    ->first();
                 if ($variant && $variant->track_quantity) {
                     $variant->increment('quantity', $item->quantity);
                     $variant->inventory?->increment('available', $item->quantity);
                 }
             } else {
-                $product = Product::find($item->product_id);
+                $product = Product::where('id', $item->product_id)
+                    ->lockForUpdate()
+                    ->first();
                 if ($product && $product->track_quantity) {
                     $product->increment('quantity', $item->quantity);
                     $product->inventory?->increment('available', $item->quantity);
@@ -248,7 +267,7 @@ class OrderController extends Controller
 
         return response()->json([
             'message' => 'Order cancelled successfully',
-            'data' => $order,
+            'data' => (new OrderResource($order))->resolve(),
         ]);
     }
 }

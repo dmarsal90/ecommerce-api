@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Api\BrandResource;
+use App\Http\Resources\Api\ProductResource;
 use App\Models\Brand;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class BrandController extends Controller
 {
@@ -12,9 +15,10 @@ class BrandController extends Controller
     {
         $brands = Brand::where('is_active', true)
             ->orderBy('sort_order')
+            ->withCount('products')
             ->get();
 
-        return response()->json(['data' => $brands]);
+        return BrandResource::collection($brands)->response();
     }
 
     public function featured(): JsonResponse
@@ -24,7 +28,7 @@ class BrandController extends Controller
             ->orderBy('sort_order')
             ->get();
 
-        return response()->json(['data' => $brands]);
+        return BrandResource::collection($brands)->response();
     }
 
     public function show(string $slug): JsonResponse
@@ -32,16 +36,16 @@ class BrandController extends Controller
         $brand = Brand::with([
             'products' => function ($q) {
                 $q->where('is_active', true)->with(['category', 'images'])->latest()->paginate(20);
-            }
+            },
         ])->where('slug', $slug)->where('is_active', true)->firstOrFail();
 
-        return response()->json(['data' => $brand]);
+        return (new BrandResource($brand))->response();
     }
 
-    public function products(string $slug, \Illuminate\Http\Request $request): JsonResponse
+    public function products(string $slug, Request $request): JsonResponse
     {
         $brand = Brand::where('slug', $slug)->where('is_active', true)->firstOrFail();
-        
+
         $query = $brand->products()
             ->with(['category', 'brand', 'images'])
             ->where('is_active', true);
@@ -73,14 +77,14 @@ class BrandController extends Controller
         $products = $query->paginate($perPage);
 
         return response()->json([
-            'data' => $products->items(),
+            'data' => ProductResource::collection($products)->resolve(),
             'meta' => [
                 'current_page' => $products->currentPage(),
                 'last_page' => $products->lastPage(),
                 'per_page' => $products->perPage(),
                 'total' => $products->total(),
             ],
-            'brand' => $brand,
+            'brand' => new BrandResource($brand)->resolve(),
         ]);
     }
 }

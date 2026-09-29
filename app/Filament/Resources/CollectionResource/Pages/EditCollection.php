@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\CollectionResource\Pages;
 
 use App\Filament\Resources\CollectionResource;
-use Filament\Resources\Pages\EditRecord;
 use Filament\Pages\PageConfiguration;
+use Filament\Resources\Pages\EditRecord;
 
 class EditCollection extends EditRecord
 {

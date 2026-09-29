@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\ProductAttributeResource\Pages;
 
 use App\Filament\Resources\ProductAttributeResource;
-use Filament\Resources\Pages\EditRecord;
 use Filament\Pages\PageConfiguration;
+use Filament\Resources\Pages\EditRecord;
 
 class EditProductAttribute extends EditRecord
 {

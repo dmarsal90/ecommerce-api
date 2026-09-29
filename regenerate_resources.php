@@ -179,50 +179,50 @@ $resources = [
 $basePath = '/home/david/Proyectos/ecommerce-api/app/Filament/Resources/';
 
 foreach ($resources as $name => $config) {
-    $file = $basePath . $name . '.php';
-    
+    $file = $basePath.$name.'.php';
+
     // Read original to get form/table content
     $original = file_get_contents($file);
-    
+
     // Extract form schema content (between ->schema([ and ]);)
     // Extract table content
-    
+
     // Build imports
     $imports = [
         "use App\\Filament\\Resources\\{$name}\\Pages;",
         "use App\\Models\\{$config['model']};",
-        "use Filament\\Schemas\\Schema;",
+        'use Filament\\Schemas\\Schema;',
     ];
-    
+
     // Add component imports
     $componentImports = [];
     foreach ($config['components'] as $comp) {
         $componentImports[] = "use Filament\\Schemas\\Components\\{$comp};";
     }
     $imports = array_merge($imports, $componentImports);
-    
+
     // Add Set if needed
     if ($config['usesSet']) {
-        $imports[] = "use Filament\\Schemas\\Components\\Utilities\\Set;";
+        $imports[] = 'use Filament\\Schemas\\Components\\Utilities\\Set;';
     }
-    
+
     // Add Resource and Tables imports
-    $imports[] = "use Filament\\Resources\\Resource;";
-    $imports[] = "use Filament\\Tables;";
-    
+    $imports[] = 'use Filament\\Resources\\Resource;';
+    $imports[] = 'use Filament\\Tables;';
+
     // Add table column imports
     foreach ($config['tableColumns'] as $col) {
         $imports[] = "use Filament\\Tables\\Columns\\{$col};";
     }
-    $imports[] = "use Filament\\Tables\\Table;";
-    
+    $imports[] = 'use Filament\\Tables\\Table;';
+
     // Check if uses Builder
     if (strpos($original, 'Illuminate\\Database\\Eloquent\\Builder') !== false) {
-        $imports[] = "use Illuminate\\Database\\Eloquent\\Builder;";
+        $imports[] = 'use Illuminate\\Database\\Eloquent\\Builder;';
     }
-    
+
     $importsStr = implode("\n", $imports);
-    
+
     // Build the class
     $class = <<<PHP
 <?php
@@ -239,11 +239,11 @@ class {$name} extends Resource
 
     protected static string|\UnitEnum|null \$navigationGroup = '{$config['group']}';
 PHP;
-    
+
     if ($config['sort'] !== null) {
         $class .= "\n    protected static ?int \$navigationSort = {$config['sort']};\n";
     }
-    
+
     $class .= "\n    public static function form(Schema \$schema): Schema\n    {\n        return \$schema\n            ->schema([\n                // TODO: form schema\n            ]);\n    }\n\n    public static function table(Table \$table): Table\n    {\n        return \$table\n            ->columns([\n                // TODO: table columns\n            ]);\n    }\n\n    public static function getRelations(): array\n    {\n        return [\n            //\n        ];\n    }\n\n    public static function getPages(): array\n    {\n        return [\n            'index' => Pages\\List{$config['model']}s::route('/'),\n            'create' => Pages\\Create{$config['model']}::route('/create'),\n            'edit' => Pages\\Edit{$config['model']}::route('/{record}/edit'),\n        ];\n    }\n}";
 
     file_put_contents($file, $class);

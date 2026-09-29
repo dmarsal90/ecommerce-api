@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\SizeResource\Pages;
 
 use App\Filament\Resources\SizeResource;
-use Filament\Resources\Pages\CreateRecord;
 use Filament\Pages\PageConfiguration;
+use Filament\Resources\Pages\CreateRecord;
 
 class CreateSize extends CreateRecord
 {

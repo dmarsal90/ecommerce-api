@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\ProductResource\Pages;
 
 use App\Filament\Resources\ProductResource;
-use Filament\Resources\Pages\CreateRecord;
 use Filament\Pages\PageConfiguration;
+use Filament\Resources\Pages\CreateRecord;
 
 class CreateProduct extends CreateRecord
 {

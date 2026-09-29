@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\InventoryResource\Pages;
 
 use App\Filament\Resources\InventoryResource;
-use Filament\Resources\Pages\CreateRecord;
 use Filament\Pages\PageConfiguration;
+use Filament\Resources\Pages\CreateRecord;
 
 class CreateInventory extends CreateRecord
 {

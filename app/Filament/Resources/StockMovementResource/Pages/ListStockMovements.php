@@ -3,9 +3,8 @@
 namespace App\Filament\Resources\StockMovementResource\Pages;
 
 use App\Filament\Resources\StockMovementResource;
-use Filament\Resources\Pages\ListRecords;
-use Filament\Actions\CreateAction;
 use Filament\Pages\PageConfiguration;
+use Filament\Resources\Pages\ListRecords;
 
 class ListStockMovements extends ListRecords
 {

@@ -4,19 +4,19 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CollectionResource\Pages;
 use App\Models\Collection;
-use Illuminate\Support\Str;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Schema;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Actions\DeleteAction;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Illuminate\Support\Str;
 
 class CollectionResource extends Resource
 {
@@ -25,6 +25,7 @@ class CollectionResource extends Resource
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Catalog';
+
     public static function form(Schema $schema): Schema
     {
         return $schema

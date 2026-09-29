@@ -3,9 +3,9 @@
 namespace App\Filament\Resources\ReviewResource\Pages;
 
 use App\Filament\Resources\ReviewResource;
-use Filament\Resources\Pages\ListRecords;
 use Filament\Actions\CreateAction;
 use Filament\Pages\PageConfiguration;
+use Filament\Resources\Pages\ListRecords;
 
 class ListReviews extends ListRecords
 {

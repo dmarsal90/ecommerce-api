@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\CustomerResource\Pages;
 
 use App\Filament\Resources\CustomerResource;
-use Filament\Resources\Pages\ViewRecord;
 use Filament\Pages\PageConfiguration;
+use Filament\Resources\Pages\ViewRecord;
 
 class ViewCustomer extends ViewRecord
 {
@@ -15,7 +15,7 @@ class ViewCustomer extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            CustomerResource\Pages\EditCustomer::make(),
+            EditCustomer::make(),
         ];
     }
 }

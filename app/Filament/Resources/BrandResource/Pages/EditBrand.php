@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\BrandResource\Pages;
 
 use App\Filament\Resources\BrandResource;
-use Filament\Resources\Pages\EditRecord;
 use Filament\Pages\PageConfiguration;
+use Filament\Resources\Pages\EditRecord;
 
 class EditBrand extends EditRecord
 {

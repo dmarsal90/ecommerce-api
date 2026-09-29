@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\CollectionResource\Pages;
 
 use App\Filament\Resources\CollectionResource;
-use Filament\Resources\Pages\CreateRecord;
 use Filament\Pages\PageConfiguration;
+use Filament\Resources\Pages\CreateRecord;
 
 class CreateCollection extends CreateRecord
 {

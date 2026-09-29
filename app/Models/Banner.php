@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Banner extends Model
 {
@@ -68,7 +69,7 @@ class Banner extends Model
 
         static::creating(function ($banner) {
             if (empty($banner->slug)) {
-                $banner->slug = \Illuminate\Support\Str::slug($banner->title);
+                $banner->slug = Str::slug($banner->title);
             }
         });
     }

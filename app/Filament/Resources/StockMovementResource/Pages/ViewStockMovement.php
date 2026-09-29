@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\StockMovementResource\Pages;
 
 use App\Filament\Resources\StockMovementResource;
-use Filament\Resources\Pages\ViewRecord;
 use Filament\Pages\PageConfiguration;
+use Filament\Resources\Pages\ViewRecord;
 
 class ViewStockMovement extends ViewRecord
 {
@@ -15,7 +15,7 @@ class ViewStockMovement extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            StockMovementResource\Pages\EditStockMovement::make(),
+            EditStockMovement::make(),
         ];
     }
 }

@@ -7,7 +7,6 @@ use App\Models\Order;
 use App\Models\OrderAddress;
 use App\Models\OrderItem;
 use App\Models\Product;
-use App\Models\ProductVariant;
 use App\Models\Review;
 use App\Models\StockMovement;
 use App\Models\User;
@@ -83,7 +82,7 @@ class OrderSeeder extends Seeder
                     'reserved' => 0,
                     'available' => $product->quantity,
                     'low_stock_threshold' => $product->low_stock_threshold,
-                    'location' => 'A-' . rand(1, 10) . '-' . rand(1, 20),
+                    'location' => 'A-'.rand(1, 10).'-'.rand(1, 20),
                     'track_quantity' => true,
                 ]
             );
@@ -98,7 +97,7 @@ class OrderSeeder extends Seeder
                         'reserved' => 0,
                         'available' => $variant->quantity,
                         'low_stock_threshold' => $variant->low_stock_threshold,
-                        'location' => 'B-' . rand(1, 10) . '-' . rand(1, 20),
+                        'location' => 'B-'.rand(1, 10).'-'.rand(1, 20),
                         'track_quantity' => true,
                     ]
                 );
@@ -151,7 +150,7 @@ class OrderSeeder extends Seeder
             foreach ($orderProducts as $product) {
                 $quantity = rand(1, 3);
                 $useVariant = $product->variants->isNotEmpty() && rand(0, 1);
-                
+
                 if ($useVariant) {
                     $variant = $product->variants->random();
                     $price = $variant->price;
@@ -190,7 +189,7 @@ class OrderSeeder extends Seeder
 
             $order = Order::create([
                 'user_id' => $user->id,
-                'order_number' => 'ORD-' . strtoupper(Str::random(8)),
+                'order_number' => 'ORD-'.strtoupper(Str::random(8)),
                 'email' => $user->email,
                 'status' => $status,
                 'payment_status' => $paymentStatus,
@@ -260,7 +259,7 @@ class OrderSeeder extends Seeder
             $type = $types[array_rand($types)];
             $quantity = rand(1, 50);
             $quantityBefore = $inventory->available;
-            
+
             // Calculate quantity after based on type
             if (in_array($type, ['in', 'return'])) {
                 $quantityAfter = $quantityBefore + $quantity;

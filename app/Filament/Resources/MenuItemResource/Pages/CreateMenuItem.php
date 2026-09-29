@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\MenuItemResource\Pages;
 
 use App\Filament\Resources\MenuItemResource;
-use Filament\Resources\Pages\CreateRecord;
 use Filament\Pages\PageConfiguration;
+use Filament\Resources\Pages\CreateRecord;
 
 class CreateMenuItem extends CreateRecord
 {

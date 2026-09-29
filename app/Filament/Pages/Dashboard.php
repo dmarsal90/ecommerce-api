@@ -4,6 +4,7 @@ namespace App\Filament\Pages;
 
 use BackedEnum;
 use Filament\Facades\Filament;
+use Filament\Pages\Page;
 use Filament\Panel;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\EmbeddedSchema;
@@ -16,7 +17,7 @@ use Filament\Widgets\Widget;
 use Filament\Widgets\WidgetConfiguration;
 use Illuminate\Contracts\Support\Htmlable;
 
-class Dashboard extends \Filament\Pages\Page
+class Dashboard extends Page
 {
     protected static string $routePath = '/';
 
@@ -29,7 +30,7 @@ class Dashboard extends \Filament\Pages\Page
             __('filament-panels::pages/dashboard.title');
     }
 
-    public static function getNavigationIcon(): string | BackedEnum | Htmlable | null
+    public static function getNavigationIcon(): string|BackedEnum|Htmlable|null
     {
         return static::$navigationIcon
             ?? FilamentIcon::resolve(PanelsIconAlias::PAGES_DASHBOARD_NAVIGATION_ITEM)
@@ -62,12 +63,12 @@ class Dashboard extends \Filament\Pages\Page
     /**
      * @return int | array<string, ?int>
      */
-    public function getColumns(): int | array
+    public function getColumns(): int|array
     {
         return 2;
     }
 
-    public function getTitle(): string | Htmlable
+    public function getTitle(): string|Htmlable
     {
         return static::$title ?? __('filament-panels::pages/dashboard.title');
     }

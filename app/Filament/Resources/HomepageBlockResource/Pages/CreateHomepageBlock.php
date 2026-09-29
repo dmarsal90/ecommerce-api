@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\HomepageBlockResource\Pages;
 
 use App\Filament\Resources\HomepageBlockResource;
-use Filament\Resources\Pages\CreateRecord;
 use Filament\Pages\PageConfiguration;
+use Filament\Resources\Pages\CreateRecord;
 
 class CreateHomepageBlock extends CreateRecord
 {

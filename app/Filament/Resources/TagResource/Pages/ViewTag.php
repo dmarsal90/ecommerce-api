@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\TagResource\Pages;
 
 use App\Filament\Resources\TagResource;
-use Filament\Resources\Pages\ViewRecord;
 use Filament\Pages\PageConfiguration;
+use Filament\Resources\Pages\ViewRecord;
 
 class ViewTag extends ViewRecord
 {
@@ -15,7 +15,7 @@ class ViewTag extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            TagResource\Pages\EditTag::make(),
+            EditTag::make(),
         ];
     }
 }

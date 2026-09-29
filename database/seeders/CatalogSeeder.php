@@ -10,7 +10,6 @@ use App\Models\Inventory;
 use App\Models\Product;
 use App\Models\ProductAttribute;
 use App\Models\ProductAttributeValue;
-use App\Models\ProductImage;
 use App\Models\ProductVariant;
 use App\Models\ProductVariantAttributeValue;
 use App\Models\Size;
@@ -180,7 +179,7 @@ class CatalogSeeder extends Seeder
 
         for ($i = 35; $i <= 46; $i++) {
             Size::firstOrCreate(
-                ['size_group_id' => $shoeGroup->id, 'value' => (string)$i],
+                ['size_group_id' => $shoeGroup->id, 'value' => (string) $i],
                 ['name' => "EU $i", 'slug' => "eu-$i", 'sort_order' => $i - 34]
             );
         }
@@ -194,7 +193,7 @@ class CatalogSeeder extends Seeder
 
         for ($i = 32; $i <= 44; $i++) {
             Size::firstOrCreate(
-                ['size_group_id' => $numericGroup->id, 'value' => (string)$i],
+                ['size_group_id' => $numericGroup->id, 'value' => (string) $i],
                 ['name' => "Size $i", 'slug' => "size-$i", 'sort_order' => $i - 31]
             );
         }
@@ -440,8 +439,8 @@ class CatalogSeeder extends Seeder
 
             foreach ($selectedColors as $color) {
                 foreach ($selectedSizes as $size) {
-                    $sku = $product->sku . '-' . strtoupper($color->slug) . '-' . $size->value;
-                    
+                    $sku = $product->sku.'-'.strtoupper($color->slug).'-'.$size->value;
+
                     // Skip if already exists
                     if (ProductVariant::where('sku', $sku)->exists()) {
                         continue;

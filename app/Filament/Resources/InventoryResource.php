@@ -4,16 +4,16 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\InventoryResource\Pages;
 use App\Models\Inventory;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
-use Filament\Actions\DeleteAction;
 
 class InventoryResource extends Resource
 {
@@ -22,6 +22,7 @@ class InventoryResource extends Resource
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-cube-transparent';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Inventory';
+
     public static function form(Schema $schema): Schema
     {
         return $schema

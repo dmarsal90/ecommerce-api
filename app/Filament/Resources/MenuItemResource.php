@@ -4,13 +4,12 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\MenuItemResource\Pages;
 use App\Models\MenuItem;
-use Filament\Schemas\Schema;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Actions\DeleteAction;
+use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
+use Filament\Tables\Table;
 
 class MenuItemResource extends Resource
 {
@@ -19,6 +18,7 @@ class MenuItemResource extends Resource
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-link';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Content';
+
     public static function form(Schema $schema): Schema
     {
         return $schema

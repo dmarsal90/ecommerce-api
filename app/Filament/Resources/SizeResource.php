@@ -4,16 +4,16 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\SizeResource\Pages;
 use App\Models\Size;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Schema;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Actions\DeleteAction;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
+use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Support\Str;
 
 class SizeResource extends Resource
@@ -23,6 +23,7 @@ class SizeResource extends Resource
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-scale';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Catalog';
+
     public static function form(Schema $schema): Schema
     {
         return $schema

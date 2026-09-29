@@ -3,9 +3,9 @@
 namespace App\Filament\Resources\ColorResource\Pages;
 
 use App\Filament\Resources\ColorResource;
-use Filament\Resources\Pages\ListRecords;
 use Filament\Actions\CreateAction;
 use Filament\Pages\PageConfiguration;
+use Filament\Resources\Pages\ListRecords;
 
 class ListColors extends ListRecords
 {

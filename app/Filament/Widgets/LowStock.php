@@ -3,7 +3,6 @@
 namespace App\Filament\Widgets;
 
 use App\Models\Product;
-use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -13,7 +12,7 @@ class LowStock extends BaseWidget
 {
     protected static ?int $sort = 3;
 
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     public function table(Table $table): Table
     {

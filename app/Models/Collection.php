@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
 class Collection extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'name',
         'slug',
@@ -54,10 +56,10 @@ class Collection extends Model
     {
         return $query->where(function ($q) {
             $q->whereNull('start_date')
-              ->orWhere('start_date', '<=', now());
+                ->orWhere('start_date', '<=', now());
         })->where(function ($q) {
             $q->whereNull('end_date')
-              ->orWhere('end_date', '>=', now());
+                ->orWhere('end_date', '>=', now());
         });
     }
 

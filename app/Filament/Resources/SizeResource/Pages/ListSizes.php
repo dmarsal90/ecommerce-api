@@ -3,9 +3,9 @@
 namespace App\Filament\Resources\SizeResource\Pages;
 
 use App\Filament\Resources\SizeResource;
-use Filament\Resources\Pages\ListRecords;
 use Filament\Actions\CreateAction;
 use Filament\Pages\PageConfiguration;
+use Filament\Resources\Pages\ListRecords;
 
 class ListSizes extends ListRecords
 {

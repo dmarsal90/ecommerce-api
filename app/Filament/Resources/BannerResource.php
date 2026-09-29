@@ -4,21 +4,22 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\BannerResource\Pages;
 use App\Models\Banner;
-use Filament\Schemas\Schema;
+use Filament\Resources\Resource;
 use Filament\Schemas\Components\DatePicker;
 use Filament\Schemas\Components\FileUpload;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Select;
+use Filament\Schemas\Components\Textarea;
 use Filament\Schemas\Components\TextInput;
 use Filament\Schemas\Components\Toggle;
-use Filament\Schemas\Components\Textarea;
 use Filament\Schemas\Components\Utilities\Set;
-use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 
 class BannerResource extends Resource
 {
@@ -39,7 +40,7 @@ class BannerResource extends Resource
                         ->required()
                         ->maxLength(255)
                         ->live(onBlur: true)
-                        ->afterStateUpdated(fn (string $operation, $state, Set $set) => $operation === 'create' ? $set('slug', \Illuminate\Support\Str::slug($state)) : null),
+                        ->afterStateUpdated(fn (string $operation, $state, Set $set) => $operation === 'create' ? $set('slug', Str::slug($state)) : null),
 
                     TextInput::make('slug')
                         ->required()

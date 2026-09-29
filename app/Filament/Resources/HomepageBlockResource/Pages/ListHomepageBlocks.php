@@ -3,9 +3,9 @@
 namespace App\Filament\Resources\HomepageBlockResource\Pages;
 
 use App\Filament\Resources\HomepageBlockResource;
-use Filament\Resources\Pages\ListRecords;
 use Filament\Actions\CreateAction;
 use Filament\Pages\PageConfiguration;
+use Filament\Resources\Pages\ListRecords;
 
 class ListHomepageBlocks extends ListRecords
 {
