@@ -14,6 +14,7 @@ class StoreOrderRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'idempotency_key' => 'nullable|string|max:255',
             'items' => 'required|array|min:1',
             'items.*.product_id' => 'required|exists:products,id',
             'items.*.variant_id' => 'nullable|exists:product_variants,id',

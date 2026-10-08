@@ -8,10 +8,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 class ProductVariant extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'product_id',
@@ -59,6 +61,78 @@ class ProductVariant extends Model
         return $this->hasMany(ProductVariantAttributeValue::class);
     }
 
+    public function inventory(): HasOne
+    {
+        return $this->hasOne(Inventory::class, 'variant_id');
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($variant) {
+            if (empty($variant->sku)) {
+                $variant->sku = self::generateUniqueSku($variant->product_id);
+            }
+        });
+
+        static::created(function ($variant) {
+            if ($variant->track_quantity) {
+                $variant->inventory()->create([
+                    'product_id' => $variant->product_id,
+                    'sku' => $variant->sku,
+                    'quantity' => $variant->quantity,
+                    'reserved' => 0,
+                    'available' => $variant->quantity,
+                    'low_stock_threshold' => $variant->low_stock_threshold,
+                    'location' => 'Main Warehouse',
+                    'track_quantity' => true,
+                ]);
+            }
+        });
+
+        static::updated(function ($variant) {
+            if ($variant->track_quantity) {
+                $inventory = $variant->inventory;
+                if ($inventory) {
+                    $inventory->update([
+                        'quantity' => $variant->quantity,
+                        'available' => $variant->quantity - $inventory->reserved,
+                        'low_stock_threshold' => $variant->low_stock_threshold,
+                        'track_quantity' => true,
+                    ]);
+                } else {
+                    $variant->inventory()->create([
+                        'product_id' => $variant->product_id,
+                        'sku' => $variant->sku,
+                        'quantity' => $variant->quantity,
+                        'reserved' => 0,
+                        'available' => $variant->quantity,
+                        'low_stock_threshold' => $variant->low_stock_threshold,
+                        'location' => 'Main Warehouse',
+                        'track_quantity' => true,
+                    ]);
+                }
+            } else {
+                $variant->inventory()->delete();
+            }
+        });
+    }
+
+    public static function generateUniqueSku(int $productId): string
+    {
+        $product = Product::find($productId);
+        $baseSku = $product?->sku ?? 'VAR';
+        $sku = $baseSku . '-' . strtoupper(Str::random(6));
+        $counter = 1;
+
+        while (self::where('sku', $sku)->exists()) {
+            $sku = $baseSku . '-' . strtoupper(Str::random(6)) . '-' . $counter++;
+        }
+
+        return $sku;
+    }
+
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
@@ -76,11 +150,6 @@ class ProductVariant extends Model
         }
 
         return $this->quantity > 0;
-    }
-
-    public function inventory(): HasOne
-    {
-        return $this->hasOne(Inventory::class, 'variant_id');
     }
 
     public function getFormattedAttributes(): array

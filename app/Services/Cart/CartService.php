@@ -2,22 +2,23 @@
 
 namespace App\Services\Cart;
 
+use App\Models\Cart;
+use App\Models\CartItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Services\Contracts\StockServiceInterface;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 
 class CartService
 {
-    private const CART_SESSION_KEY = 'cart';
-
     public function __construct(
         private StockServiceInterface $stockService,
     ) {}
 
     public function getCart(): CartDTO
     {
-        $cart = Session::get(self::CART_SESSION_KEY, []);
+        $cart = $this->getOrCreateCart();
         return $this->buildCartDTO($cart);
     }
 
@@ -32,36 +33,40 @@ class CartService
 
         $this->validateStock($product, $variant, $quantity);
 
-        $cart = Session::get(self::CART_SESSION_KEY, []);
-        $key = $this->generateKey($productId, $variantId);
+        $cart = $this->getOrCreateCart();
 
-        if (isset($cart[$key])) {
-            $newQuantity = $cart[$key]['quantity'] + $quantity;
+        $existingItem = $cart->items()
+            ->where('product_id', $productId)
+            ->where('variant_id', $variantId)
+            ->first();
+
+        if ($existingItem) {
+            $newQuantity = $existingItem->quantity + $quantity;
             $this->validateStock($product, $variant, $newQuantity);
-            $cart[$key]['quantity'] = $newQuantity;
+            $existingItem->update(['quantity' => $newQuantity]);
         } else {
-            $cart[$key] = [
+            $cart->items()->create([
                 'product_id' => $productId,
                 'variant_id' => $variantId,
                 'quantity' => $quantity,
-            ];
+            ]);
         }
 
-        Session::put(self::CART_SESSION_KEY, $cart);
-        return $this->buildCartDTO($cart);
+        return $this->buildCartDTO($cart->fresh());
     }
 
-    public function updateItem(string $key, int $quantity): CartDTO
+    public function updateItem(int $itemId, int $quantity): CartDTO
     {
-        $cart = Session::get(self::CART_SESSION_KEY, []);
+        $cart = $this->getOrCreateCart();
 
-        if (! isset($cart[$key])) {
+        $item = $cart->items()->find($itemId);
+
+        if (! $item) {
             throw new \InvalidArgumentException('Item not found in cart');
         }
 
-        $item = $cart[$key];
-        $product = Product::find($item['product_id']);
-        $variant = $item['variant_id'] ? ProductVariant::find($item['variant_id']) : null;
+        $product = Product::find($item->product_id);
+        $variant = $item->variant_id ? ProductVariant::find($item->variant_id) : null;
 
         if (! $product || ! $product->is_active) {
             throw new \InvalidArgumentException('Product is no longer available');
@@ -69,34 +74,89 @@ class CartService
 
         $this->validateStock($product, $variant, $quantity);
 
-        $cart[$key]['quantity'] = $quantity;
-        Session::put(self::CART_SESSION_KEY, $cart);
-        return $this->buildCartDTO($cart);
+        $item->update(['quantity' => $quantity]);
+
+        return $this->buildCartDTO($cart->fresh());
     }
 
-    public function removeItem(string $key): CartDTO
+    public function removeItem(int $itemId): CartDTO
     {
-        $cart = Session::get(self::CART_SESSION_KEY, []);
+        $cart = $this->getOrCreateCart();
 
-        if (! isset($cart[$key])) {
+        $item = $cart->items()->find($itemId);
+
+        if (! $item) {
             throw new \InvalidArgumentException('Item not found in cart');
         }
 
-        unset($cart[$key]);
-        Session::put(self::CART_SESSION_KEY, $cart);
-        return $this->buildCartDTO($cart);
+        $item->delete();
+
+        return $this->buildCartDTO($cart->fresh());
     }
 
     public function clearCart(): CartDTO
     {
-        Session::forget(self::CART_SESSION_KEY);
-        return new CartDTO([], 0, 0);
+        $cart = $this->getOrCreateCart();
+        $cart->items()->delete();
+
+        return $this->buildCartDTO($cart->fresh());
     }
 
     public function getCount(): int
     {
-        $cart = Session::get(self::CART_SESSION_KEY, []);
-        return array_sum(array_column($cart, 'quantity'));
+        $cart = $this->getOrCreateCart();
+        return $cart->items()->sum('quantity');
+    }
+
+    public function mergeGuestCartToUser(int $userId): void
+    {
+        $sessionId = Session::getId();
+        if (! $sessionId) {
+            return;
+        }
+
+        $guestCart = Cart::where('session_id', $sessionId)
+            ->whereNull('user_id')
+            ->first();
+
+        if (! $guestCart) {
+            return;
+        }
+
+        $userCart = Cart::firstOrCreate(['user_id' => $userId]);
+
+        foreach ($guestCart->items as $item) {
+            $existingItem = $userCart->items()
+                ->where('product_id', $item->product_id)
+                ->where('variant_id', $item->variant_id)
+                ->first();
+
+            if ($existingItem) {
+                $existingItem->increment('quantity', $item->quantity);
+                $item->delete();
+            } else {
+                $item->update(['cart_id' => $userCart->id]);
+            }
+        }
+
+        $guestCart->delete();
+    }
+
+    private function getOrCreateCart(): Cart
+    {
+        $user = Auth::user();
+
+        if ($user) {
+            return Cart::firstOrCreate(['user_id' => $user->id]);
+        }
+
+        $sessionId = Session::getId();
+        if (! $sessionId) {
+            Session::start();
+            $sessionId = Session::getId();
+        }
+
+        return Cart::firstOrCreate(['session_id' => $sessionId]);
     }
 
     private function validateStock(Product $product, ?ProductVariant $variant, int $quantity): void
@@ -109,43 +169,37 @@ class CartService
         }
     }
 
-    private function buildCartDTO(array $cart): CartDTO
+    private function buildCartDTO(Cart $cart): CartDTO
     {
-        $productIds = array_column($cart, 'product_id');
-        $variantIds = array_filter(array_column($cart, 'variant_id'));
+        $items = $cart->items()
+            ->with([
+                'product.images',
+                'variant.attributeValues.attribute',
+            ])
+            ->get();
 
-        $products = Product::with('images')
-            ->whereIn('id', $productIds)
-            ->get()
-            ->keyBy('id');
-
-        $variants = ProductVariant::with('attributeValues.attribute')
-            ->whereIn('id', $variantIds)
-            ->get()
-            ->keyBy('id');
-
-        $items = [];
+        $cartItems = [];
         $subtotal = 0;
         $totalQuantity = 0;
 
-        foreach ($cart as $key => $item) {
-            $product = $products->get($item['product_id']);
-            $variant = $item['variant_id'] ? $variants->get($item['variant_id']) : null;
+        foreach ($items as $item) {
+            $product = $item->product;
+            $variant = $item->variant;
 
             if (! $product || ! $product->is_active) {
                 continue;
             }
 
             $price = $variant?->price ?? $product->price;
-            $lineTotal = $price * $item['quantity'];
+            $lineTotal = $price * $item->quantity;
             $subtotal += $lineTotal;
-            $totalQuantity += $item['quantity'];
+            $totalQuantity += $item->quantity;
 
-            $items[] = new CartItemDTO(
-                key: $key,
+            $cartItems[] = new CartItemDTO(
+                key: (string) $item->id,
                 productId: $product->id,
-                variantId: $item['variant_id'] ?? null,
-                quantity: $item['quantity'],
+                variantId: $item->variant_id,
+                quantity: $item->quantity,
                 price: $price,
                 total: $lineTotal,
                 product: [
@@ -170,11 +224,6 @@ class CartService
             );
         }
 
-        return new CartDTO($items, round($subtotal, 2), $totalQuantity);
-    }
-
-    private function generateKey(int $productId, ?int $variantId): string
-    {
-        return $variantId ? "{$productId}:{$variantId}" : (string) $productId;
+        return new CartDTO($cartItems, round($subtotal, 2), $totalQuantity);
     }
 }

@@ -25,6 +25,18 @@ class OrderService
     {
         $user = Auth::user();
         $cartItems = $validatedData['items'];
+        $idempotencyKey = $validatedData['idempotency_key'] ?? null;
+
+        // Check for existing order with same idempotency key
+        if ($idempotencyKey) {
+            $existingOrder = Order::where('idempotency_key', $idempotencyKey)
+                ->where('user_id', $user->id)
+                ->first();
+
+            if ($existingOrder) {
+                return $existingOrder->load(['items.product.images', 'items.variant.attributeValues.attribute', 'addresses']);
+            }
+        }
 
         $items = $this->prepareOrderItems($cartItems);
         $subtotal = $this->pricingCalculator->calculateSubtotal($items);
@@ -54,8 +66,8 @@ class OrderService
             currency: config('shop.currency', 'USD'),
         );
 
-        return DB::transaction(function () use ($orderData, $items) {
-            $order = $this->createOrder($orderData);
+        return DB::transaction(function () use ($orderData, $items, $idempotencyKey) {
+            $order = $this->createOrder($orderData, $idempotencyKey);
             $this->createOrderItems($order, $items);
             $this->createOrderAddresses($order, $orderData);
             $this->decrementStock($items);
@@ -63,6 +75,11 @@ class OrderService
 
             return $order->load(['items.product.images', 'items.variant.attributeValues.attribute', 'addresses']);
         });
+    }
+
+    public function getPricingCalculator(): PricingCalculatorInterface
+    {
+        return $this->pricingCalculator;
     }
 
     public function cancelOrder(Order $order): Order
@@ -136,10 +153,11 @@ class OrderService
         return $items;
     }
 
-    private function createOrder(OrderDataDTO $orderData): Order
+    private function createOrder(OrderDataDTO $orderData, ?string $idempotencyKey = null): Order
     {
         return Order::create(array_merge($orderData->toArray(), [
             'order_number' => 'ORD-' . strtoupper(Str::random(8)),
+            'idempotency_key' => $idempotencyKey,
             'status' => 'pending',
             'payment_status' => 'pending',
             'fulfillment_status' => 'unfulfilled',
@@ -181,6 +199,19 @@ class OrderService
 
             if ($model && $model->track_quantity) {
                 $this->stockService->incrementStock($model, $item->quantity);
+            }
+        }
+    }
+
+    public function decrementStockForOrder(Order $order): void
+    {
+        foreach ($order->items as $item) {
+            $model = $item->variant_id
+                ? ProductVariant::find($item->variant_id)
+                : Product::find($item->product_id);
+
+            if ($model && $model->track_quantity) {
+                $this->stockService->decrementStock($model, $item->quantity);
             }
         }
     }

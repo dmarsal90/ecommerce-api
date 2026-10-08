@@ -4,9 +4,12 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\CheckoutController;
 use App\Http\Controllers\Api\CollectionController;
+use App\Http\Controllers\Api\CouponController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\WebhookController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -41,14 +44,21 @@ Route::middleware(['auth:sanctum', 'api'])->group(function () {
     Route::get('/orders/{orderNumber}', [OrderController::class, 'show']);
     Route::post('/orders', [OrderController::class, 'store']);
     Route::post('/orders/{orderNumber}/cancel', [OrderController::class, 'cancel']);
+
+    // Checkout
+    Route::post('/checkout/payment-intent', [CheckoutController::class, 'createPaymentIntent']);
+
+    // Coupons
+    Route::post('/coupons/validate', [CouponController::class, 'validate']);
+    Route::get('/coupons', [CouponController::class, 'index']);
 });
 
 // Cart (accessible to both guests and authenticated users)
 Route::middleware('api')->group(function () {
     Route::get('/cart', [CartController::class, 'index']);
     Route::post('/cart', [CartController::class, 'add']);
-    Route::put('/cart/{key}', [CartController::class, 'update']);
-    Route::delete('/cart/{key}', [CartController::class, 'remove']);
+    Route::put('/cart/{itemId}', [CartController::class, 'update']);
+    Route::delete('/cart/{itemId}', [CartController::class, 'remove']);
     Route::delete('/cart', [CartController::class, 'clear']);
     Route::get('/cart/count', [CartController::class, 'count']);
 });
@@ -57,6 +67,11 @@ Route::middleware('api')->group(function () {
 Route::middleware('api')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
+});
+
+// Public webhook routes (no auth required, but validated by Stripe signature)
+Route::middleware('api')->group(function () {
+    Route::post('/webhooks/stripe', [WebhookController::class, 'stripe']);
 });
 
 // Public product routes

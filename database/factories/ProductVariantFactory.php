@@ -18,6 +18,7 @@ class ProductVariantFactory extends Factory
             'price' => $this->faker->randomFloat(2, 10, 500),
             'compare_at_price' => $this->faker->optional(0.3)->randomFloat(2, 100, 1000),
             'quantity' => $this->faker->numberBetween(0, 500),
+            'low_stock_threshold' => $this->faker->numberBetween(1, 10),
             'track_quantity' => true,
             'is_active' => true,
         ];

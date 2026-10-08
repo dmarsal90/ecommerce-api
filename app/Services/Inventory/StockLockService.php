@@ -82,6 +82,18 @@ class StockLockService implements StockServiceInterface
 
     private function lockForUpdate(Product|ProductVariant $item): Product|ProductVariant
     {
+        $driver = DB::connection()->getDriverName();
+
+        // SQLite doesn't support FOR UPDATE, but uses database-level locking during transactions
+        // So we can just fetch the row without lockForUpdate() in SQLite
+        if ($driver === 'sqlite') {
+            return match (true) {
+                $item instanceof ProductVariant => ProductVariant::where('id', $item->id)->firstOrFail(),
+                default => Product::where('id', $item->id)->firstOrFail(),
+            };
+        }
+
+        // For PostgreSQL/MySQL, use row-level locking
         return match (true) {
             $item instanceof ProductVariant => ProductVariant::where('id', $item->id)->lockForUpdate()->firstOrFail(),
             default => Product::where('id', $item->id)->lockForUpdate()->firstOrFail(),

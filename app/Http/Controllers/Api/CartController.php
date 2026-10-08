@@ -45,12 +45,12 @@ class CartController extends Controller
         }
     }
 
-    public function update(UpdateCartQuantityRequest $request, string $key): JsonResponse
+    public function update(UpdateCartQuantityRequest $request, int $itemId): JsonResponse
     {
         $validated = $request->validated();
 
         try {
-            $this->cartService->updateItem($key, $validated['quantity']);
+            $this->cartService->updateItem($itemId, $validated['quantity']);
 
             return response()->json([
                 'message' => 'Cart updated',
@@ -63,10 +63,10 @@ class CartController extends Controller
         }
     }
 
-    public function remove(string $key): JsonResponse
+    public function remove(int $itemId): JsonResponse
     {
         try {
-            $this->cartService->removeItem($key);
+            $this->cartService->removeItem($itemId);
 
             return response()->json([
                 'message' => 'Item removed from cart',

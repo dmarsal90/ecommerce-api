@@ -7,11 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
 class Product extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'name',
@@ -72,6 +74,11 @@ class Product extends Model
         return $this->belongsTo(Brand::class);
     }
 
+    public function inventory(): HasOne
+    {
+        return $this->hasOne(Inventory::class, 'product_id')->whereNull('variant_id');
+    }
+
     public function collections(): BelongsToMany
     {
         return $this->belongsToMany(Collection::class, 'product_collection')
@@ -96,18 +103,83 @@ class Product extends Model
 
         static::creating(function ($product) {
             if (empty($product->slug)) {
-                $product->slug = Str::slug($product->name);
+                $product->slug = self::generateUniqueSlug($product->name);
             }
             if (empty($product->sku)) {
-                $product->sku = 'SKU-'.strtoupper(Str::random(8));
+                $product->sku = self::generateUniqueSku();
+            }
+        });
+
+        static::created(function ($product) {
+            if ($product->track_quantity) {
+                $product->inventory()->create([
+                    'sku' => $product->sku,
+                    'quantity' => $product->quantity,
+                    'reserved' => 0,
+                    'available' => $product->quantity,
+                    'low_stock_threshold' => $product->low_stock_threshold,
+                    'location' => 'Main Warehouse',
+                    'track_quantity' => true,
+                ]);
             }
         });
 
         static::updating(function ($product) {
             if ($product->isDirty('name') && empty($product->slug)) {
-                $product->slug = Str::slug($product->name);
+                $product->slug = self::generateUniqueSlug($product->name);
             }
         });
+
+        static::updated(function ($product) {
+            if ($product->track_quantity) {
+                $inventory = $product->inventory;
+                if ($inventory) {
+                    $inventory->update([
+                        'quantity' => $product->quantity,
+                        'available' => $product->quantity - $inventory->reserved,
+                        'low_stock_threshold' => $product->low_stock_threshold,
+                        'track_quantity' => true,
+                    ]);
+                } else {
+                    $product->inventory()->create([
+                        'sku' => $product->sku,
+                        'quantity' => $product->quantity,
+                        'reserved' => 0,
+                        'available' => $product->quantity,
+                        'low_stock_threshold' => $product->low_stock_threshold,
+                        'location' => 'Main Warehouse',
+                        'track_quantity' => true,
+                    ]);
+                }
+            } else {
+                $product->inventory()->delete();
+            }
+        });
+    }
+
+    public static function generateUniqueSlug(string $name): string
+    {
+        $slug = Str::slug($name);
+        $originalSlug = $slug;
+        $counter = 1;
+
+        while (self::where('slug', $slug)->exists()) {
+            $slug = $originalSlug . '-' . $counter++;
+        }
+
+        return $slug;
+    }
+
+    public static function generateUniqueSku(): string
+    {
+        $sku = 'SKU-' . strtoupper(Str::random(8));
+        $counter = 1;
+
+        while (self::where('sku', $sku)->exists()) {
+            $sku = 'SKU-' . strtoupper(Str::random(8)) . '-' . $counter++;
+        }
+
+        return $sku;
     }
 
     public function getRouteKeyName(): string

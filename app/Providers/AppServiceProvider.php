@@ -7,12 +7,15 @@ use App\Models\Product;
 use App\Policies\OrderPolicy;
 use App\Policies\ProductPolicy;
 use App\Services\Cart\CartService;
+use App\Services\Contracts\PaymentGatewayInterface;
 use App\Services\Contracts\PricingCalculatorInterface;
 use App\Services\Contracts\ProductFilterServiceInterface;
 use App\Services\Contracts\StockServiceInterface;
 use App\Services\Inventory\StockLockService;
+use App\Services\Order\CheckoutService;
 use App\Services\Order\OrderService;
 use App\Services\Order\PricingCalculator;
+use App\Services\Payment\StripePaymentGateway;
 use App\Services\Product\ProductFilterService;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -32,8 +35,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(StockServiceInterface::class, StockLockService::class);
         $this->app->bind(PricingCalculatorInterface::class, PricingCalculator::class);
         $this->app->bind(ProductFilterServiceInterface::class, ProductFilterService::class);
+        $this->app->bind(PaymentGatewayInterface::class, StripePaymentGateway::class);
         $this->app->singleton(CartService::class);
         $this->app->singleton(OrderService::class);
+        $this->app->singleton(CheckoutService::class);
     }
 
     /**
