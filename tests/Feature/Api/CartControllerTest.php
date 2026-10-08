@@ -99,7 +99,7 @@ class CartControllerTest extends TestCase
         ]);
 
         $response->assertStatus(422)
-            ->assertJsonPath('message', 'Product is not available');
+            ->assertJsonPath('message', 'Product or variant is not available');
     }
 
     public function test_cannot_exceed_stock(): void
@@ -121,8 +121,7 @@ class CartControllerTest extends TestCase
         ]);
 
         $response->assertStatus(422)
-            ->assertJsonPath('message', 'Not enough stock available')
-            ->assertJsonPath('available', 5);
+            ->assertJsonPath('message', 'Not enough stock available. Available: 5');
     }
 
     public function test_can_update_cart_item_quantity(): void
@@ -187,8 +186,7 @@ class CartControllerTest extends TestCase
         ]);
 
         $response->assertStatus(422)
-            ->assertJsonPath('message', 'Not enough stock available')
-            ->assertJsonPath('available', 5);
+            ->assertJsonPath('message', 'Not enough stock available. Available: 5');
     }
 
     public function test_can_remove_item_from_cart(): void

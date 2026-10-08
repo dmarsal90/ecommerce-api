@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class ProductVariantAttributeValue extends Pivot
 {
+    protected $table = 'product_variant_attribute_values';
+
     protected $fillable = [
         'variant_id',
         'attribute_value_id',

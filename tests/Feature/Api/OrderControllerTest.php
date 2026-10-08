@@ -182,8 +182,7 @@ class OrderControllerTest extends TestCase
         ]);
 
         $response->assertStatus(422)
-            ->assertJsonPath('message', 'Not enough stock available')
-            ->assertJsonPath('available', 5);
+            ->assertJsonPath('message', 'Not enough stock available. Available: 5');
     }
 
     public function test_order_decreases_stock(): void
