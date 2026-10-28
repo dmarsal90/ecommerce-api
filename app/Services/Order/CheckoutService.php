@@ -3,9 +3,12 @@
 namespace App\Services\Order;
 
 use App\Models\Order;
+use App\Models\OrderAddress;
+use App\Models\OrderItem;
+use App\Models\Product;
+use App\Models\ProductVariant;
 use App\Services\Contracts\PaymentGatewayInterface;
 use App\Services\Contracts\StockServiceInterface;
-use App\Services\Inventory\StockLockService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -52,7 +55,7 @@ class CheckoutService
         $items = $this->prepareOrderItems($cartItems);
 
         // Calculate totals
-        $orderService = app(\App\Services\Order\OrderService::class);
+        $orderService = app(OrderService::class);
         $pricingCalculator = $orderService->getPricingCalculator();
 
         $subtotal = $pricingCalculator->calculateSubtotal($items);
@@ -61,11 +64,11 @@ class CheckoutService
         $discount = $pricingCalculator->calculateDiscount($items);
         $total = $pricingCalculator->calculateTotal($subtotal, $tax, $shipping, $discount);
 
-        $shippingAddress = \App\Services\Order\OrderAddressDTO::fromArray($validatedData['shipping_address'], 'shipping');
+        $shippingAddress = OrderAddressDTO::fromArray($validatedData['shipping_address'], 'shipping');
         $billingAddressData = $validatedData['billing_address'] ?? $validatedData['shipping_address'];
-        $billingAddress = \App\Services\Order\OrderAddressDTO::fromArray($billingAddressData, 'billing');
+        $billingAddress = OrderAddressDTO::fromArray($billingAddressData, 'billing');
 
-        $orderData = new \App\Services\Order\OrderDataDTO(
+        $orderData = new OrderDataDTO(
             userId: $user->id,
             email: $user->email,
             phone: $validatedData['shipping_address']['phone'] ?? null,
@@ -82,10 +85,10 @@ class CheckoutService
             currency: config('shop.currency', 'USD'),
         );
 
-        return DB::transaction(function () use ($orderData, $items, $idempotencyKey, $validatedData) {
+        return DB::transaction(function () use ($orderData, $items, $idempotencyKey, $validatedData, $orderService) {
             // Create order with pending payment status
             $order = Order::create(array_merge($orderData->toArray(), [
-                'order_number' => 'ORD-' . strtoupper(Str::random(8)),
+                'order_number' => 'ORD-'.strtoupper(Str::random(8)),
                 'idempotency_key' => $idempotencyKey,
                 'status' => 'pending',
                 'payment_status' => 'pending',
@@ -94,12 +97,14 @@ class CheckoutService
 
             // Create order items
             foreach ($items as $item) {
-                \App\Models\OrderItem::create(array_merge($item->toArray(), ['order_id' => $order->id]));
+                OrderItem::create(array_merge($item->toArray(), ['order_id' => $order->id]));
             }
 
+            $orderService->decrementStock($items);
+
             // Create addresses
-            \App\Models\OrderAddress::create(array_merge($orderData->shippingAddress->toArray(), ['order_id' => $order->id]));
-            \App\Models\OrderAddress::create(array_merge($orderData->billingAddress->toArray(), ['order_id' => $order->id]));
+            OrderAddress::create(array_merge($orderData->shippingAddress->toArray(), ['order_id' => $order->id]));
+            OrderAddress::create(array_merge($orderData->billingAddress->toArray(), ['order_id' => $order->id]));
 
             // Create payment intent for card payments
             $paymentIntent = null;
@@ -137,8 +142,8 @@ class CheckoutService
         $items = [];
 
         foreach ($cartItems as $itemData) {
-            $product = \App\Models\Product::findOrFail($itemData['product_id']);
-            $variant = isset($itemData['variant_id']) ? \App\Models\ProductVariant::findOrFail($itemData['variant_id']) : null;
+            $product = Product::findOrFail($itemData['product_id']);
+            $variant = isset($itemData['variant_id']) ? ProductVariant::findOrFail($itemData['variant_id']) : null;
 
             if (! $product->is_active || ($variant && ! $variant->is_active)) {
                 throw new \InvalidArgumentException('Product or variant is not available');
@@ -165,7 +170,7 @@ class CheckoutService
 
             $total = $price * $quantity;
 
-            $items[] = new \App\Services\Order\OrderItemDTO(
+            $items[] = new OrderItemDTO(
                 productId: $product->id,
                 variantId: $variant?->id,
                 quantity: $quantity,

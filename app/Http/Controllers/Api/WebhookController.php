@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Services\Contracts\PaymentGatewayInterface;
 use App\Services\Order\OrderService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -18,16 +19,16 @@ class WebhookController extends Controller
     public function stripe(Request $request): JsonResponse
     {
         $payload = $request->getContent();
-        $signature = $request->header('Stripe-Signature');
+        $signature = (string) $request->header('Stripe-Signature');
 
         try {
-            $event = app(\App\Services\Contracts\PaymentGatewayInterface::class)->handleWebhook($payload, $signature);
+            $event = app(PaymentGatewayInterface::class)->handleWebhook($payload, $signature);
 
             $this->handleStripeEvent($event);
 
             return response()->json(['received' => true]);
         } catch (\InvalidArgumentException $e) {
-            Log::error('Stripe webhook error: ' . $e->getMessage());
+            Log::error('Stripe webhook error: '.$e->getMessage());
 
             return response()->json(['error' => 'Invalid webhook'], 400);
         }
@@ -59,20 +60,17 @@ class WebhookController extends Controller
 
         if (! $order) {
             Log::warning("Order not found for payment intent: {$paymentIntentId}");
+
             return;
         }
 
+        // Stock was already decremented at order creation
         if ($order->payment_status !== 'paid') {
             $order->update([
                 'payment_status' => 'paid',
                 'status' => 'paid',
                 'paid_at' => now(),
             ]);
-
-            // Decrement stock for the order
-            // Note: Stock was already decremented at order creation
-            // This is just a safety check
-            $this->orderService->decrementStockForOrder($order);
         }
     }
 
@@ -87,7 +85,7 @@ class WebhookController extends Controller
 
         $order = Order::where('payment_reference', $paymentIntentId)->first();
 
-        if (! $order) {
+        if (! $order || $order->payment_status !== 'pending') {
             return;
         }
 
@@ -110,7 +108,7 @@ class WebhookController extends Controller
 
         $order = Order::where('payment_reference', $paymentIntentId)->first();
 
-        if (! $order) {
+        if (! $order || $order->payment_status === 'refunded') {
             return;
         }
 

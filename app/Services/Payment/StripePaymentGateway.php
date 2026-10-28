@@ -50,12 +50,13 @@ class StripePaymentGateway implements PaymentGatewayInterface
 
         try {
             $event = $this->stripe->webhooks->constructEvent($payload, $signature, $webhookSecret);
+
             return [
                 'type' => $event->type,
-                'data' => $event->data->object,
+                'data' => $event->data->object->toArray(),
             ];
         } catch (\Exception $e) {
-            throw new \InvalidArgumentException('Invalid webhook signature: ' . $e->getMessage());
+            throw new \InvalidArgumentException('Invalid webhook signature: '.$e->getMessage());
         }
     }
 

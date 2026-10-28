@@ -9,7 +9,6 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Services\Contracts\PricingCalculatorInterface;
 use App\Services\Contracts\StockServiceInterface;
-use App\Services\Inventory\StockLockService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -156,7 +155,7 @@ class OrderService
     private function createOrder(OrderDataDTO $orderData, ?string $idempotencyKey = null): Order
     {
         return Order::create(array_merge($orderData->toArray(), [
-            'order_number' => 'ORD-' . strtoupper(Str::random(8)),
+            'order_number' => 'ORD-'.strtoupper(Str::random(8)),
             'idempotency_key' => $idempotencyKey,
             'status' => 'pending',
             'payment_status' => 'pending',
@@ -177,7 +176,7 @@ class OrderService
         OrderAddress::create(array_merge($orderData->billingAddress->toArray(), ['order_id' => $order->id]));
     }
 
-    private function decrementStock(array $items): void
+    public function decrementStock(array $items): void
     {
         foreach ($items as $item) {
             $model = $item->variantId
@@ -190,7 +189,7 @@ class OrderService
         }
     }
 
-    private function restoreStock(Order $order): void
+    public function restoreStock(Order $order): void
     {
         foreach ($order->items as $item) {
             $model = $item->variant_id
@@ -199,19 +198,6 @@ class OrderService
 
             if ($model && $model->track_quantity) {
                 $this->stockService->incrementStock($model, $item->quantity);
-            }
-        }
-    }
-
-    public function decrementStockForOrder(Order $order): void
-    {
-        foreach ($order->items as $item) {
-            $model = $item->variant_id
-                ? ProductVariant::find($item->variant_id)
-                : Product::find($item->product_id);
-
-            if ($model && $model->track_quantity) {
-                $this->stockService->decrementStock($model, $item->quantity);
             }
         }
     }

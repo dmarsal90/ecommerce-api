@@ -2,7 +2,6 @@
 
 namespace App\Services\Inventory;
 
-use App\Models\Inventory;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Services\Contracts\StockServiceInterface;
@@ -14,6 +13,7 @@ class StockLockService implements StockServiceInterface
     {
         return DB::transaction(function () use ($item) {
             $lockedItem = $this->lockForUpdate($item);
+
             return $lockedItem->inventory?->available ?? $lockedItem->quantity;
         });
     }
@@ -25,6 +25,7 @@ class StockLockService implements StockServiceInterface
         }
 
         $available = $this->getAvailableStock($item);
+
         return $available >= $quantity;
     }
 
@@ -62,7 +63,7 @@ class StockLockService implements StockServiceInterface
 
         DB::transaction(function () use ($item, $quantity) {
             $lockedItem = $this->lockForUpdate($item);
-            $lockedItem->inventory?->decrement('reserved', -$quantity);
+            $lockedItem->inventory?->increment('reserved', $quantity);
             $lockedItem->inventory?->decrement('available', $quantity);
         });
     }
@@ -75,7 +76,7 @@ class StockLockService implements StockServiceInterface
 
         DB::transaction(function () use ($item, $quantity) {
             $lockedItem = $this->lockForUpdate($item);
-            $lockedItem->inventory?->increment('reserved', $quantity);
+            $lockedItem->inventory?->decrement('reserved', $quantity);
             $lockedItem->inventory?->increment('available', $quantity);
         });
     }
