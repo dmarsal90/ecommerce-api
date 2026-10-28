@@ -15,6 +15,8 @@ class Profile extends Page implements HasSchemas
 {
     use InteractsWithSchemas;
 
+    protected static bool $shouldRegisterNavigation = false;
+
     protected string $view = 'filament.pages.profile';
 
     public ?array $data = [];

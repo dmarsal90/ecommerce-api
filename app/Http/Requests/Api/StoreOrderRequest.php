@@ -39,6 +39,7 @@ class StoreOrderRequest extends FormRequest
             'billing_address.postal_code' => 'required_with:billing_address|string|max:20',
             'billing_address.country' => 'required_with:billing_address|string|max:2',
             'billing_address.phone' => 'nullable|string|max:20',
+            'coupon_code' => 'nullable|string|max:50',
             'payment_method' => 'required|string',
             'notes' => 'nullable|string',
         ];

@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\ApiRateLimiter;
 use App\Http\Middleware\AuthRateLimiter;
+use App\Http\Middleware\CartToken;
 use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -20,6 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'auth.rate-limiter' => AuthRateLimiter::class,
             'api.rate-limiter' => ApiRateLimiter::class,
             'security.headers' => SecurityHeaders::class,
+            'cart.token' => CartToken::class,
         ]);
 
         $middleware->group('api', [

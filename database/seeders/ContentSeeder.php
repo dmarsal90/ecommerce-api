@@ -249,7 +249,7 @@ class ContentSeeder extends Seeder
             [
                 'type' => 'hero_slider',
                 'title' => 'Hero Slider',
-                'settings' => json_encode([
+                'settings' => [
                     'slides' => [
                         ['image' => 'hero/slide-1.jpg', 'title' => 'Spring Collection', 'subtitle' => 'Up to 50% off', 'cta_text' => 'Shop Now', 'cta_url' => '/collections/spring-2024'],
                         ['image' => 'hero/slide-2.jpg', 'title' => 'New Arrivals', 'subtitle' => 'Fresh styles weekly', 'cta_text' => 'View All', 'cta_url' => '/new-arrivals'],
@@ -257,77 +257,77 @@ class ContentSeeder extends Seeder
                     ],
                     'autoplay' => true,
                     'interval' => 5000,
-                ]),
+                ],
                 'sort_order' => 1,
                 'is_active' => true,
             ],
             [
                 'type' => 'featured_categories',
                 'title' => 'Shop by Category',
-                'settings' => json_encode([
+                'settings' => [
                     'categories' => ['men', 'women', 'kids', 'accessories'],
                     'show_images' => true,
                     'columns' => 4,
-                ]),
+                ],
                 'sort_order' => 2,
                 'is_active' => true,
             ],
             [
                 'type' => 'featured_products',
                 'title' => 'Featured Products',
-                'settings' => json_encode([
+                'settings' => [
                     'product_limit' => 8,
                     'show_price' => true,
                     'show_rating' => true,
                     'layout' => 'grid',
-                ]),
+                ],
                 'sort_order' => 3,
                 'is_active' => true,
             ],
             [
                 'type' => 'banner_grid',
                 'title' => 'Promotional Banners',
-                'settings' => json_encode([
+                'settings' => [
                     'banners' => [
                         ['image' => 'promo/promo-1.jpg', 'title' => 'Men\'s Sale', 'url' => '/men?sale=true'],
                         ['image' => 'promo/promo-2.jpg', 'title' => 'Women\'s Sale', 'url' => '/women?sale=true'],
                         ['image' => 'promo/promo-3.jpg', 'title' => 'Accessories', 'url' => '/accessories'],
                     ],
                     'columns' => 3,
-                ]),
+                ],
                 'sort_order' => 4,
                 'is_active' => true,
             ],
             [
                 'type' => 'newsletter_signup',
                 'title' => 'Newsletter Signup',
-                'settings' => json_encode([
+                'settings' => [
                     'title' => 'Join Our Newsletter',
                     'subtitle' => 'Get 10% off your first order',
                     'button_text' => 'Subscribe',
                     'background_color' => '#f5f5f5',
-                ]),
+                ],
                 'sort_order' => 5,
                 'is_active' => true,
             ],
             [
                 'type' => 'brand_showcase',
                 'title' => 'Our Brands',
-                'settings' => json_encode([
+                'settings' => [
                     'brands' => ['nike', 'adidas', 'puma', 'under-armour', 'new-balance', 'levis'],
                     'scrollable' => true,
-                ]),
+                ],
                 'sort_order' => 6,
                 'is_active' => true,
             ],
             [
                 'type' => 'instagram_feed',
                 'title' => 'Instagram Feed',
-                'settings' => json_encode([
+                'settings' => [
                     'username' => 'fashionstore',
                     'post_count' => 6,
                     'show_follow_button' => true,
-                ]),
+                ],
                 'sort_order' => 7,
                 'is_active' => true,
             ],

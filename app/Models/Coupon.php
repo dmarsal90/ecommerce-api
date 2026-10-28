@@ -58,7 +58,7 @@ class Coupon extends Model
                 $q->whereNull('expires_at')->orWhere('expires_at', '>=', now());
             })
             ->where(function ($q) {
-                $q->whereNull('usage_limit')->orWhere('used_count', '<', 'usage_limit');
+                $q->whereNull('usage_limit')->orWhereColumn('used_count', '<', 'usage_limit');
             });
     }
 

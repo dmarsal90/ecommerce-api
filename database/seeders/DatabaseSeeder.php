@@ -27,6 +27,8 @@ class DatabaseSeeder extends Seeder
         // Content (banners, pages, menus, homepage blocks)
         $this->call(ContentSeeder::class);
 
+        $this->call(CouponSeeder::class);
+
         // Orders, customers, inventory, reviews
         $this->call(OrderSeeder::class);
 

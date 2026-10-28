@@ -17,6 +17,7 @@ use App\Services\Order\OrderService;
 use App\Services\Order\PricingCalculator;
 use App\Services\Payment\StripePaymentGateway;
 use App\Services\Product\ProductFilterService;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -48,5 +49,7 @@ class AppServiceProvider extends ServiceProvider
     {
         Gate::policy(Order::class, OrderPolicy::class);
         Gate::policy(Product::class, ProductPolicy::class);
+
+        ResetPassword::createUrlUsing(fn ($user, string $token) => config('app.frontend_url').'/reset-password?token='.$token.'&email='.urlencode($user->getEmailForPasswordReset()));
     }
 }
