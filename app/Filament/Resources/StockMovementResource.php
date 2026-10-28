@@ -41,6 +41,8 @@ class StockMovementResource extends Resource
                         'transfer' => 'Transfer',
                         'reserved' => 'Reserved',
                         'released' => 'Released',
+                        'return' => 'Return',
+                        'damaged' => 'Damaged',
                     ])
                     ->required(),
 
