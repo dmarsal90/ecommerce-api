@@ -60,8 +60,9 @@ class CheckoutService
 
         $subtotal = $pricingCalculator->calculateSubtotal($items);
         $tax = $pricingCalculator->calculateTax($subtotal);
-        $shipping = $pricingCalculator->calculateShipping($subtotal);
-        $discount = $pricingCalculator->calculateDiscount($items);
+        $coupon = $orderService->resolveCoupon($validatedData['coupon_code'] ?? null, $items, $subtotal);
+        $shipping = $coupon?->type === 'free_shipping' ? 0.0 : $pricingCalculator->calculateShipping($subtotal);
+        $discount = $coupon ? $coupon->calculateDiscount($subtotal) : $pricingCalculator->calculateDiscount($items);
         $total = $pricingCalculator->calculateTotal($subtotal, $tax, $shipping, $discount);
 
         $shippingAddress = OrderAddressDTO::fromArray($validatedData['shipping_address'], 'shipping');
@@ -85,7 +86,7 @@ class CheckoutService
             currency: config('shop.currency', 'USD'),
         );
 
-        return DB::transaction(function () use ($orderData, $items, $idempotencyKey, $validatedData, $orderService) {
+        return DB::transaction(function () use ($orderData, $items, $idempotencyKey, $validatedData, $orderService, $coupon) {
             // Create order with pending payment status
             $order = Order::create(array_merge($orderData->toArray(), [
                 'order_number' => 'ORD-'.strtoupper(Str::random(8)),
@@ -101,6 +102,10 @@ class CheckoutService
             }
 
             $orderService->decrementStock($items);
+
+            if ($coupon) {
+                $orderService->recordCoupon($order, $coupon);
+            }
 
             // Create addresses
             OrderAddress::create(array_merge($orderData->shippingAddress->toArray(), ['order_id' => $order->id]));
