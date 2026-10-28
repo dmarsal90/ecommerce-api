@@ -18,6 +18,10 @@ use Spatie\Permission\Models\Role;
 
 class CustomerResource extends Resource
 {
+    protected static ?string $navigationLabel = 'Customers';
+
+    protected static ?string $modelLabel = 'Customer';
+
     protected static ?string $model = User::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-users';

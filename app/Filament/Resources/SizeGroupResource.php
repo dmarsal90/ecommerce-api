@@ -20,7 +20,7 @@ class SizeGroupResource extends Resource
 {
     protected static ?string $model = SizeGroup::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-scale';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-squares-plus';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Catalog';
 
