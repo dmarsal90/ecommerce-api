@@ -7,11 +7,20 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class CartControllerTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // Guest carts are identified by this header, as the frontend will send it.
+        $this->withHeader('X-Cart-Token', (string) Str::uuid());
+    }
 
     public function test_can_get_empty_cart(): void
     {

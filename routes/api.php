@@ -58,7 +58,7 @@ Route::middleware(['auth:sanctum', 'api'])->group(function () {
 });
 
 // Cart (accessible to both guests and authenticated users)
-Route::middleware('api')->group(function () {
+Route::middleware(['api', 'cart.token'])->group(function () {
     Route::get('/cart', [CartController::class, 'index']);
     Route::post('/cart', [CartController::class, 'add']);
     Route::put('/cart/{itemId}', [CartController::class, 'update']);
@@ -68,7 +68,7 @@ Route::middleware('api')->group(function () {
 });
 
 // Public auth routes with auth rate limiter
-Route::middleware('api')->group(function () {
+Route::middleware(['api', 'cart.token'])->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/forgot-password', [PasswordResetController::class, 'forgot']);
