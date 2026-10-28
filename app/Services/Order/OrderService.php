@@ -2,6 +2,7 @@
 
 namespace App\Services\Order;
 
+use App\Models\Coupon;
 use App\Models\Order;
 use App\Models\OrderAddress;
 use App\Models\OrderItem;
@@ -40,8 +41,9 @@ class OrderService
         $items = $this->prepareOrderItems($cartItems);
         $subtotal = $this->pricingCalculator->calculateSubtotal($items);
         $tax = $this->pricingCalculator->calculateTax($subtotal);
-        $shipping = $this->pricingCalculator->calculateShipping($subtotal);
-        $discount = $this->pricingCalculator->calculateDiscount($items);
+        $coupon = $this->resolveCoupon($validatedData['coupon_code'] ?? null, $items, $subtotal);
+        $shipping = $coupon?->type === 'free_shipping' ? 0.0 : $this->pricingCalculator->calculateShipping($subtotal);
+        $discount = $coupon ? $coupon->calculateDiscount($subtotal) : $this->pricingCalculator->calculateDiscount($items);
         $total = $this->pricingCalculator->calculateTotal($subtotal, $tax, $shipping, $discount);
 
         $shippingAddress = OrderAddressDTO::fromArray($validatedData['shipping_address'], 'shipping');
@@ -65,8 +67,11 @@ class OrderService
             currency: config('shop.currency', 'USD'),
         );
 
-        return DB::transaction(function () use ($orderData, $items, $idempotencyKey) {
+        return DB::transaction(function () use ($orderData, $items, $idempotencyKey, $coupon) {
             $order = $this->createOrder($orderData, $idempotencyKey);
+            if ($coupon) {
+                $this->recordCoupon($order, $coupon);
+            }
             $this->createOrderItems($order, $items);
             $this->createOrderAddresses($order, $orderData);
             $this->decrementStock($items);
@@ -74,6 +79,37 @@ class OrderService
 
             return $order->load(['items.product.images', 'items.variant.attributeValues.attribute', 'addresses']);
         });
+    }
+
+    /** @throws \InvalidArgumentException when a code is given but cannot be applied */
+    public function resolveCoupon(?string $code, array $items, float $subtotal): ?Coupon
+    {
+        if (! $code) {
+            return null;
+        }
+
+        $productIds = array_map(fn ($item) => $item->productId, $items);
+
+        return app(CouponService::class)->validateCoupon($code, $subtotal, $productIds)
+            ?? throw new \InvalidArgumentException('Coupon is invalid or expired');
+    }
+
+    /** Counts a use atomically so concurrent orders cannot exceed usage_limit. */
+    public function recordCoupon(Order $order, Coupon $coupon): void
+    {
+        $updated = Coupon::whereKey($coupon->id)
+            ->where(fn ($q) => $q->whereNull('usage_limit')->orWhereColumn('used_count', '<', 'usage_limit'))
+            ->increment('used_count');
+
+        if (! $updated) {
+            throw new \InvalidArgumentException('Coupon usage limit reached');
+        }
+
+        $order->update(['meta_data' => array_merge($order->meta_data ?? [], [
+            'coupon_code' => $coupon->code,
+            'coupon_type' => $coupon->type,
+            'coupon_value' => $coupon->value,
+        ])]);
     }
 
     public function getPricingCalculator(): PricingCalculatorInterface

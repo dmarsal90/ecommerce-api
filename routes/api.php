@@ -6,9 +6,12 @@ use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CheckoutController;
 use App\Http\Controllers\Api\CollectionController;
+use App\Http\Controllers\Api\ContentController;
 use App\Http\Controllers\Api\CouponController;
 use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\PasswordResetController;
 use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\WebhookController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -49,12 +52,13 @@ Route::middleware(['auth:sanctum', 'api'])->group(function () {
     Route::post('/checkout/payment-intent', [CheckoutController::class, 'createPaymentIntent']);
 
     // Coupons
+    Route::post('/products/{slug}/reviews', [ReviewController::class, 'store']);
     Route::post('/coupons/validate', [CouponController::class, 'validate']);
     Route::get('/coupons', [CouponController::class, 'index']);
 });
 
 // Cart (accessible to both guests and authenticated users)
-Route::middleware('api')->group(function () {
+Route::middleware(['api', 'cart.token'])->group(function () {
     Route::get('/cart', [CartController::class, 'index']);
     Route::post('/cart', [CartController::class, 'add']);
     Route::put('/cart/{itemId}', [CartController::class, 'update']);
@@ -64,9 +68,11 @@ Route::middleware('api')->group(function () {
 });
 
 // Public auth routes with auth rate limiter
-Route::middleware('api')->group(function () {
+Route::middleware(['api', 'cart.token'])->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/forgot-password', [PasswordResetController::class, 'forgot']);
+    Route::post('/reset-password', [PasswordResetController::class, 'reset']);
 });
 
 // Public webhook routes (no auth required, but validated by Stripe signature)
@@ -81,6 +87,7 @@ Route::middleware('api')->group(function () {
     Route::get('/products/new-arrivals', [ProductController::class, 'newArrivals']);
     Route::get('/products/on-sale', [ProductController::class, 'onSale']);
     Route::get('/products/{slug}/related', [ProductController::class, 'related']);
+    Route::get('/products/{slug}/reviews', [ReviewController::class, 'index']);
     Route::get('/products/{slug}', [ProductController::class, 'show']);
 
     // Public category routes
@@ -99,4 +106,17 @@ Route::middleware('api')->group(function () {
     Route::get('/collections', [CollectionController::class, 'index']);
     Route::get('/collections/{slug}', [CollectionController::class, 'show']);
     Route::get('/collections/{slug}/products', [CollectionController::class, 'products']);
+});
+
+// Public content routes (storefront CMS data and settings)
+Route::middleware('api')->group(function () {
+    Route::get('/config', [ContentController::class, 'config']);
+    Route::get('/banners', [ContentController::class, 'banners']);
+    Route::get('/homepage', [ContentController::class, 'homepage']);
+    Route::get('/menus', [ContentController::class, 'menus']);
+    Route::get('/pages', [ContentController::class, 'pages']);
+    Route::get('/pages/{slug}', [ContentController::class, 'page']);
+    Route::get('/tags', [ContentController::class, 'tags']);
+    Route::get('/colors', [ContentController::class, 'colors']);
+    Route::get('/sizes', [ContentController::class, 'sizes']);
 });

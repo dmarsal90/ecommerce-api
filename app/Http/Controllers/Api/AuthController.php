@@ -11,6 +11,7 @@ use App\Http\Requests\Api\UpdateProfileRequest;
 use App\Http\Resources\Api\AddressResource;
 use App\Http\Resources\Api\UserResource;
 use App\Models\User;
+use App\Services\Cart\CartService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -29,6 +30,7 @@ class AuthController extends Controller
         ]);
 
         $token = $user->createToken('api-token')->plainTextToken;
+        app(CartService::class)->mergeGuestCartToUser($user->id);
 
         return response()->json([
             'user' => (new UserResource($user))->resolve(),
@@ -46,6 +48,7 @@ class AuthController extends Controller
 
         $user = Auth::user();
         $token = $user->createToken('api-token')->plainTextToken;
+        app(CartService::class)->mergeGuestCartToUser($user->id);
 
         return response()->json([
             'user' => (new UserResource($user))->resolve(),

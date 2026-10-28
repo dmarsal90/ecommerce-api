@@ -7,7 +7,6 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Services\Contracts\StockServiceInterface;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
 
 class CartService
 {
@@ -111,12 +110,12 @@ class CartService
 
     public function mergeGuestCartToUser(int $userId): void
     {
-        $sessionId = Session::getId();
-        if (! $sessionId) {
+        $guestToken = request()->header('X-Cart-Token');
+        if (! $guestToken) {
             return;
         }
 
-        $guestCart = Cart::where('session_id', $sessionId)
+        $guestCart = Cart::where('session_id', $guestToken)
             ->whereNull('user_id')
             ->first();
 
@@ -145,19 +144,14 @@ class CartService
 
     private function getOrCreateCart(): Cart
     {
-        $user = Auth::user();
+        // Cart routes are public, so resolve the Bearer token explicitly.
+        $user = Auth::guard('sanctum')->user();
 
         if ($user) {
             return Cart::firstOrCreate(['user_id' => $user->id]);
         }
 
-        $sessionId = Session::getId();
-        if (! $sessionId) {
-            Session::start();
-            $sessionId = Session::getId();
-        }
-
-        return Cart::firstOrCreate(['session_id' => $sessionId]);
+        return Cart::firstOrCreate(['session_id' => request()->header('X-Cart-Token')]);
     }
 
     private function validateStock(Product $product, ?ProductVariant $variant, int $quantity): void
