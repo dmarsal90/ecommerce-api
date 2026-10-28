@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\ProductFilterRequest;
 use App\Http\Resources\Api\ProductResource;
-use App\Models\Product;
 use App\Services\Product\ProductFilterService;
 use Illuminate\Http\JsonResponse;
 

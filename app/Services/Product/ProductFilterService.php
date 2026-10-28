@@ -18,6 +18,7 @@ class ProductFilterService implements ProductFilterServiceInterface
         $this->applySorting($query, $filters['sort'] ?? 'newest');
 
         $perPage = $filters['per_page'] ?? 20;
+
         return $query->paginate($perPage);
     }
 

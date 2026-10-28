@@ -3,7 +3,6 @@
 namespace App\Services\Cart;
 
 use App\Models\Cart;
-use App\Models\CartItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Services\Contracts\StockServiceInterface;
@@ -19,6 +18,7 @@ class CartService
     public function getCart(): CartDTO
     {
         $cart = $this->getOrCreateCart();
+
         return $this->buildCartDTO($cart);
     }
 
@@ -105,6 +105,7 @@ class CartService
     public function getCount(): int
     {
         $cart = $this->getOrCreateCart();
+
         return $cart->items()->sum('quantity');
     }
 

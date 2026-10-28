@@ -4,7 +4,7 @@ namespace App\Services\Order;
 
 use App\Models\Coupon;
 use App\Models\Order;
-use App\Models\Product;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 
 class CouponService
@@ -51,7 +51,7 @@ class CouponService
         return $discount;
     }
 
-    public function getValidCoupons(float $subtotal, array $productIds = [], array $categoryIds = []): \Illuminate\Database\Eloquent\Collection
+    public function getValidCoupons(float $subtotal, array $productIds = [], array $categoryIds = []): Collection
     {
         return Coupon::validForOrder($subtotal, $productIds, $categoryIds)
             ->orderBy('value', 'desc')

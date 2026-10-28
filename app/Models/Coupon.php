@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Coupon extends Model
@@ -139,7 +138,7 @@ class Coupon extends Model
         }
 
         // Check how many times this customer has used this coupon
-        $usageCount = \App\Models\Order::where('user_id', $customerId)
+        $usageCount = Order::where('user_id', $customerId)
             ->whereJsonContains('meta_data->coupon_code', $this->code)
             ->count();
 

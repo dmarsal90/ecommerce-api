@@ -123,11 +123,11 @@ class ProductVariant extends Model
     {
         $product = Product::find($productId);
         $baseSku = $product?->sku ?? 'VAR';
-        $sku = $baseSku . '-' . strtoupper(Str::random(6));
+        $sku = $baseSku.'-'.strtoupper(Str::random(6));
         $counter = 1;
 
         while (self::where('sku', $sku)->exists()) {
-            $sku = $baseSku . '-' . strtoupper(Str::random(6)) . '-' . $counter++;
+            $sku = $baseSku.'-'.strtoupper(Str::random(6)).'-'.$counter++;
         }
 
         return $sku;

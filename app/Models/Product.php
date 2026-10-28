@@ -164,7 +164,7 @@ class Product extends Model
         $counter = 1;
 
         while (self::where('slug', $slug)->exists()) {
-            $slug = $originalSlug . '-' . $counter++;
+            $slug = $originalSlug.'-'.$counter++;
         }
 
         return $slug;
@@ -172,11 +172,11 @@ class Product extends Model
 
     public static function generateUniqueSku(): string
     {
-        $sku = 'SKU-' . strtoupper(Str::random(8));
+        $sku = 'SKU-'.strtoupper(Str::random(8));
         $counter = 1;
 
         while (self::where('sku', $sku)->exists()) {
-            $sku = 'SKU-' . strtoupper(Str::random(8)) . '-' . $counter++;
+            $sku = 'SKU-'.strtoupper(Str::random(8)).'-'.$counter++;
         }
 
         return $sku;

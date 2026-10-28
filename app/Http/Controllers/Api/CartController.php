@@ -57,6 +57,7 @@ class CartController extends Controller
             ]);
         } catch (InvalidArgumentException $e) {
             $status = $e->getMessage() === 'Item not found in cart' ? 404 : 422;
+
             return response()->json([
                 'message' => $e->getMessage(),
             ], $status);

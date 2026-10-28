@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\ValidateCouponRequest;
 use App\Http\Resources\Api\CouponResource;
-use App\Models\Coupon;
+use App\Services\Cart\CartService;
 use App\Services\Order\CouponService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -21,7 +21,7 @@ class CouponController extends Controller
         $validated = $request->validated();
 
         $user = Auth::user();
-        $cart = app(\App\Services\Cart\CartService::class)->getCart();
+        $cart = app(CartService::class)->getCart();
 
         $productIds = $cart->items ? array_column($cart->items, 'product_id') : [];
         // Category IDs would need to be fetched from products
@@ -52,7 +52,7 @@ class CouponController extends Controller
     public function index(): JsonResponse
     {
         $user = Auth::user();
-        $cart = app(\App\Services\Cart\CartService::class)->getCart();
+        $cart = app(CartService::class)->getCart();
 
         $productIds = $cart->items ? array_column($cart->items, 'product_id') : [];
 

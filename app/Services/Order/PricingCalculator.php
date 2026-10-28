@@ -14,12 +14,14 @@ class PricingCalculator implements PricingCalculatorInterface
             $quantity = $item instanceof OrderItemDTO ? $item->quantity : ($item['quantity'] ?? 0);
             $subtotal += $price * $quantity;
         }
+
         return round($subtotal, 2);
     }
 
     public function calculateTax(float $subtotal): float
     {
         $taxRate = config('shop.tax_rate', 0.08);
+
         return round($subtotal * $taxRate, 2);
     }
 
