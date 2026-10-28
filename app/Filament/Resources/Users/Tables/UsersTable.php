@@ -18,8 +18,7 @@ class UsersTable
             ->columns([
                 ImageColumn::make('avatar_url')
                     ->label('Avatar')
-                    ->circular()
-                    ->defaultImageUrl(url('/images/default-avatar.png')),
+                    ->circular(),
                 TextColumn::make('name')
                     ->searchable(),
                 TextColumn::make('email')

@@ -104,6 +104,7 @@ class BannerResource extends Resource
                         'hero' => 'success',
                         'sidebar' => 'warning',
                         'footer' => 'info',
+                        default => 'gray',
                     }),
 
                 TextColumn::make('start_date')
