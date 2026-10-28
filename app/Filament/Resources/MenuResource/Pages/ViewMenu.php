@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\MenuResource\Pages;
 
 use App\Filament\Resources\MenuResource;
+use Filament\Actions\EditAction;
 use Filament\Pages\PageConfiguration;
 use Filament\Resources\Pages\ViewRecord;
 
@@ -15,7 +16,7 @@ class ViewMenu extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            EditMenu::make(),
+            EditAction::make(),
         ];
     }
 }

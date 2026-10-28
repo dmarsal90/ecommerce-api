@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\RoleResource\Pages;
 
 use App\Filament\Resources\RoleResource;
+use Filament\Actions\EditAction;
 use Filament\Pages\PageConfiguration;
 use Filament\Resources\Pages\ViewRecord;
 
@@ -15,7 +16,7 @@ class ViewRole extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            EditRole::make(),
+            EditAction::make(),
         ];
     }
 }

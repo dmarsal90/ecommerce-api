@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\BrandResource\Pages;
 
 use App\Filament\Resources\BrandResource;
+use Filament\Actions\EditAction;
 use Filament\Pages\PageConfiguration;
 use Filament\Resources\Pages\ViewRecord;
 
@@ -15,7 +16,7 @@ class ViewBrand extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            EditBrand::make(),
+            EditAction::make(),
         ];
     }
 }

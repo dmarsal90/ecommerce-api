@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\ColorResource\Pages;
 
 use App\Filament\Resources\ColorResource;
+use Filament\Actions\EditAction;
 use Filament\Pages\PageConfiguration;
 use Filament\Resources\Pages\ViewRecord;
 
@@ -15,7 +16,7 @@ class ViewColor extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            EditColor::make(),
+            EditAction::make(),
         ];
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\ProductAttributeResource\Pages;
 
 use App\Filament\Resources\ProductAttributeResource;
+use Filament\Actions\EditAction;
 use Filament\Pages\PageConfiguration;
 use Filament\Resources\Pages\ViewRecord;
 
@@ -15,7 +16,7 @@ class ViewProductAttribute extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            EditProductAttribute::make(),
+            EditAction::make(),
         ];
     }
 }

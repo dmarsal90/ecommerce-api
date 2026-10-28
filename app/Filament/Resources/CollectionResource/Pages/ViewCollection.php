@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\CollectionResource\Pages;
 
 use App\Filament\Resources\CollectionResource;
+use Filament\Actions\EditAction;
 use Filament\Pages\PageConfiguration;
 use Filament\Resources\Pages\ViewRecord;
 
@@ -15,7 +16,7 @@ class ViewCollection extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            EditCollection::make(),
+            EditAction::make(),
         ];
     }
 }

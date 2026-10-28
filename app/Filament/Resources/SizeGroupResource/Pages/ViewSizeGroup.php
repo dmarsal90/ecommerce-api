@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\SizeGroupResource\Pages;
 
 use App\Filament\Resources\SizeGroupResource;
+use Filament\Actions\EditAction;
 use Filament\Pages\PageConfiguration;
 use Filament\Resources\Pages\ViewRecord;
 
@@ -15,7 +16,7 @@ class ViewSizeGroup extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            EditSizeGroup::make(),
+            EditAction::make(),
         ];
     }
 }

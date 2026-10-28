@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\ReviewResource\Pages;
 
 use App\Filament\Resources\ReviewResource;
+use Filament\Actions\EditAction;
 use Filament\Pages\PageConfiguration;
 use Filament\Resources\Pages\ViewRecord;
 
@@ -15,7 +16,7 @@ class ViewReview extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            EditReview::make(),
+            EditAction::make(),
         ];
     }
 }
