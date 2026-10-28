@@ -4,19 +4,21 @@ namespace App\Services\Payment;
 
 use App\Services\Contracts\PaymentGatewayInterface;
 use Stripe\StripeClient;
+use Stripe\Webhook;
 
 class StripePaymentGateway implements PaymentGatewayInterface
 {
-    private StripeClient $stripe;
+    private ?StripeClient $stripe = null;
 
-    public function __construct()
+    // Built on first use so checkouts that don't touch Stripe work without a secret key.
+    private function stripe(): StripeClient
     {
-        $this->stripe = new StripeClient(config('services.stripe.secret'));
+        return $this->stripe ??= new StripeClient(config('services.stripe.secret'));
     }
 
     public function createPaymentIntent(float $amount, string $currency, array $metadata = []): array
     {
-        $paymentIntent = $this->stripe->paymentIntents->create([
+        $paymentIntent = $this->stripe()->paymentIntents->create([
             'amount' => (int) round($amount * 100), // Convert to cents
             'currency' => strtolower($currency),
             'automatic_payment_methods' => ['enabled' => true],
@@ -34,7 +36,7 @@ class StripePaymentGateway implements PaymentGatewayInterface
 
     public function confirmPaymentIntent(string $paymentIntentId): array
     {
-        $paymentIntent = $this->stripe->paymentIntents->retrieve($paymentIntentId);
+        $paymentIntent = $this->stripe()->paymentIntents->retrieve($paymentIntentId);
 
         return [
             'id' => $paymentIntent->id,
@@ -49,7 +51,7 @@ class StripePaymentGateway implements PaymentGatewayInterface
         $webhookSecret = config('services.stripe.webhook_secret');
 
         try {
-            $event = $this->stripe->webhooks->constructEvent($payload, $signature, $webhookSecret);
+            $event = Webhook::constructEvent($payload, $signature, $webhookSecret);
 
             return [
                 'type' => $event->type,
@@ -67,7 +69,7 @@ class StripePaymentGateway implements PaymentGatewayInterface
             $params['amount'] = (int) round($amount * 100);
         }
 
-        $refund = $this->stripe->refunds->create($params);
+        $refund = $this->stripe()->refunds->create($params);
 
         return [
             'id' => $refund->id,
