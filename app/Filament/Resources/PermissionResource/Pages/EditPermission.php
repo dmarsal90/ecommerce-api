@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\PermissionResource\Pages;
 
+use App\Filament\Concerns\SavesAndCloses;
 use App\Filament\Resources\PermissionResource;
 use Filament\Actions;
 use Filament\Pages\PageConfiguration;
@@ -9,6 +10,8 @@ use Filament\Resources\Pages\EditRecord;
 
 class EditPermission extends EditRecord
 {
+    use SavesAndCloses;
+
     protected static string $resource = PermissionResource::class;
 
     protected static ?string $configurationClass = PageConfiguration::class;

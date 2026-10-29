@@ -4,9 +4,12 @@ namespace App\Providers\Filament;
 
 use App\Filament\Pages\Dashboard;
 use App\Filament\Widgets\LowStock;
+use App\Filament\Widgets\OrdersByStatus;
 use App\Filament\Widgets\RecentOrders;
+use App\Filament\Widgets\RevenueByPaymentMethod;
 use App\Filament\Widgets\SalesChart;
 use App\Filament\Widgets\StatsOverview;
+use App\Filament\Widgets\TopProducts;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\FileUpload;
@@ -66,6 +69,9 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
                 StatsOverview::class,
                 SalesChart::class,
+                OrdersByStatus::class,
+                TopProducts::class,
+                RevenueByPaymentMethod::class,
                 RecentOrders::class,
                 LowStock::class,
             ])
