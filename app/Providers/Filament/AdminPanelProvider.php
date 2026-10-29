@@ -39,7 +39,7 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->default()
             ->id('admin')
-            ->path('admin')
+            ->path(config('app.admin_path'))
             ->brandName('Sennitwo')
             ->login()
             ->font('Inter')
