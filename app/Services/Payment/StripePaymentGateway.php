@@ -48,6 +48,11 @@ class StripePaymentGateway implements PaymentGatewayInterface
         ];
     }
 
+    public function cancelPaymentIntent(string $paymentIntentId): void
+    {
+        $this->stripe()->paymentIntents->cancel($paymentIntentId);
+    }
+
     public function confirmPaymentIntent(string $paymentIntentId): array
     {
         $paymentIntent = $this->stripe()->paymentIntents->retrieve($paymentIntentId);

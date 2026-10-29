@@ -8,17 +8,20 @@ use App\Models\OrderAddress;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Services\Contracts\PaymentGatewayInterface;
 use App\Services\Contracts\PricingCalculatorInterface;
 use App\Services\Contracts\StockServiceInterface;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Stripe\Exception\InvalidRequestException;
 
 class OrderService
 {
     public function __construct(
         private PricingCalculatorInterface $pricingCalculator,
         private StockServiceInterface $stockService,
+        private PaymentGatewayInterface $paymentGateway,
     ) {}
 
     public function createFromCart(array $validatedData): Order
@@ -127,11 +130,25 @@ class OrderService
             throw new \InvalidArgumentException('Order is already cancelled');
         }
 
+        // Cancelling a paid order would keep the customer's money: that needs a refund by support.
+        if ($order->payment_status === 'paid') {
+            throw new \InvalidArgumentException('Paid orders must be refunded by support');
+        }
+
         return DB::transaction(function () use ($order) {
             $order->update([
                 'status' => 'cancelled',
                 'cancelled_at' => now(),
             ]);
+
+            // Close the open PaymentIntent so the customer cannot pay for an order that no longer exists.
+            if ($order->payment_reference && $order->payment_status === 'pending') {
+                try {
+                    $this->paymentGateway->cancelPaymentIntent($order->payment_reference);
+                } catch (InvalidRequestException) {
+                    throw new \InvalidArgumentException('The payment is already being processed and cannot be cancelled');
+                }
+            }
 
             $this->restoreStock($order);
 
