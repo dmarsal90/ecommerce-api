@@ -11,6 +11,8 @@ interface PaymentGatewayInterface
      */
     public function createPaymentIntent(float $amount, string $currency, array $metadata = [], array $options = []): array;
 
+    public function cancelPaymentIntent(string $paymentIntentId): void;
+
     public function confirmPaymentIntent(string $paymentIntentId): array;
 
     /** @return array{id: string, type: string, data: array} */

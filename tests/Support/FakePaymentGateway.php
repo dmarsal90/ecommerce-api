@@ -19,6 +19,10 @@ class FakePaymentGateway implements PaymentGatewayInterface
 
     public array $intents = [];
 
+    public array $cancelled = [];
+
+    public array $refunds = [];
+
     public int $customerCalls = 0;
 
     /** Simulates Stripe.js confirming a SetupIntent in the browser: the card ends up attached to the customer. */
@@ -69,6 +73,11 @@ class FakePaymentGateway implements PaymentGatewayInterface
         return ['id' => $id, 'client_secret' => $id.'_secret_x', 'amount' => (int) round($amount * 100), 'currency' => $currency, 'status' => 'requires_confirmation'];
     }
 
+    public function cancelPaymentIntent(string $paymentIntentId): void
+    {
+        $this->cancelled[] = $paymentIntentId;
+    }
+
     public function confirmPaymentIntent(string $paymentIntentId): array
     {
         return ['id' => $paymentIntentId, 'status' => 'succeeded', 'amount' => 0, 'currency' => 'usd'];
@@ -81,6 +90,8 @@ class FakePaymentGateway implements PaymentGatewayInterface
 
     public function refund(string $paymentIntentId, ?float $amount = null): array
     {
+        $this->refunds[] = $paymentIntentId;
+
         return ['id' => 're_1', 'amount' => 0, 'currency' => 'usd', 'status' => 'succeeded'];
     }
 }
