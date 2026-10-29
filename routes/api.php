@@ -59,7 +59,10 @@ Route::middleware(['auth:sanctum', 'api'])->group(function () {
     });
 
     // Checkout
-    Route::post('/checkout/payment-intent', [CheckoutController::class, 'createPaymentIntent']);
+    Route::middleware(['throttle:payments', 'no-store'])->group(function () {
+        Route::get('/checkout/requirements', [CheckoutController::class, 'requirements']);
+        Route::post('/checkout/payment-intent', [CheckoutController::class, 'createPaymentIntent']);
+    });
 
     // Coupons
     Route::post('/products/{slug}/reviews', [ReviewController::class, 'store']);

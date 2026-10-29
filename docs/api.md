@@ -95,6 +95,7 @@ Funciona para invitados (con `X-Cart-Token`) y para usuarios (con Bearer).
 | GET | `/coupons` | Cupones aplicables al carrito actual |
 | POST | `/coupons/validate` | Cuerpo `{ code }`. 200 → `{ valid, coupon, discount, new_subtotal }`; 422 → `{ valid: false, message }` |
 | POST | `/orders` | Crea un pedido (pagos que no son con tarjeta, p. ej. `bank_transfer`) |
+| GET | `/checkout/requirements` | Tarjetas y direcciones guardadas + `next_step` (`payment_method` → `billing_address` → `shipping_address` → `ready`) |
 | POST | `/checkout/payment-intent` | Crea el pedido y, si `payment_method` es `credit_card` o `stripe`, un PaymentIntent de Stripe |
 | GET | `/orders` | Pedidos del usuario, paginados |
 | GET | `/orders/{orderNumber}` | Detalle (404 si no es tuyo) |
