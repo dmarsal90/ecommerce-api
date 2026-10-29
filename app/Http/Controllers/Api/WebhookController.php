@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Models\StripeEvent;
 use App\Services\Contracts\PaymentGatewayInterface;
 use App\Services\Order\OrderService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class WebhookController extends Controller
@@ -24,7 +26,14 @@ class WebhookController extends Controller
         try {
             $event = app(PaymentGatewayInterface::class)->handleWebhook($payload, $signature);
 
-            $this->handleStripeEvent($event);
+            // Claim and handle atomically: a failed handler rolls the claim back so Stripe's retry is processed.
+            DB::transaction(function () use ($event) {
+                if (StripeEvent::insertOrIgnore(['id' => $event['id'], 'type' => $event['type']]) === 0) {
+                    return; // replay or retry of an event we already applied
+                }
+
+                $this->handleStripeEvent($event);
+            });
 
             return response()->json(['received' => true]);
         } catch (\InvalidArgumentException $e) {
@@ -56,10 +65,29 @@ class WebhookController extends Controller
             return;
         }
 
-        $order = Order::where('payment_reference', $paymentIntentId)->first();
+        $order = Order::where('payment_reference', $paymentIntentId)->lockForUpdate()->first();
 
         if (! $order) {
             Log::warning("Order not found for payment intent: {$paymentIntentId}");
+
+            return;
+        }
+
+        // Never trust the event alone: it must describe exactly this order and exactly what it costs.
+        $received = $data['amount_received'] ?? $data['amount'] ?? null;
+        if ((string) $metadata['order_id'] !== (string) $order->id
+            || $received !== (int) round($order->total * 100)
+            || strtolower((string) ($data['currency'] ?? '')) !== strtolower($order->currency)) {
+            Log::critical('Stripe payment does not match its order', ['order_id' => $order->id, 'payment_intent' => $paymentIntentId]);
+
+            return;
+        }
+
+        // The order was cancelled (or its payment failed) before the money arrived: give it back.
+        if (in_array($order->status, ['cancelled', 'payment_failed'], true)) {
+            app(PaymentGatewayInterface::class)->refund($paymentIntentId);
+            $order->update(['payment_status' => 'refunded']);
+            Log::warning('Refunded a payment received for an inactive order', ['order_id' => $order->id]);
 
             return;
         }
