@@ -61,7 +61,11 @@ class OrderController extends Controller
 
     public function store(StoreOrderRequest $request): JsonResponse
     {
-        $validated = $request->validated();
+        if ($request->isCard()) {
+            return response()->json(['message' => 'Card payments must be started from /checkout/payment-intent'], 422);
+        }
+
+        $validated = $request->checkoutData();
 
         try {
             $order = $this->orderService->createFromCart($validated);

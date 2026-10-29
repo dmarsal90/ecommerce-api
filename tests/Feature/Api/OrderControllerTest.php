@@ -95,7 +95,7 @@ class OrderControllerTest extends TestCase
                 'postal_code' => '10001',
                 'country' => 'US',
             ],
-            'payment_method' => 'credit_card',
+            'payment_method' => 'bank_transfer',
         ]);
 
         $response->assertStatus(201)
@@ -131,7 +131,7 @@ class OrderControllerTest extends TestCase
                 'postal_code' => '10001',
                 'country' => 'US',
             ],
-            'payment_method' => 'credit_card',
+            'payment_method' => 'bank_transfer',
         ]);
 
         $response->assertStatus(422)
@@ -149,7 +149,7 @@ class OrderControllerTest extends TestCase
                     'quantity' => 1,
                 ],
             ],
-            'payment_method' => 'credit_card',
+            'payment_method' => 'bank_transfer',
         ]);
 
         $response->assertStatus(422)
@@ -178,7 +178,7 @@ class OrderControllerTest extends TestCase
                 'postal_code' => '10001',
                 'country' => 'US',
             ],
-            'payment_method' => 'credit_card',
+            'payment_method' => 'bank_transfer',
         ]);
 
         $response->assertStatus(422)
@@ -207,7 +207,7 @@ class OrderControllerTest extends TestCase
                 'postal_code' => '10001',
                 'country' => 'US',
             ],
-            'payment_method' => 'credit_card',
+            'payment_method' => 'bank_transfer',
         ]);
 
         $this->product->refresh();

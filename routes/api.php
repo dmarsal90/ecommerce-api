@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\ContentController;
 use App\Http\Controllers\Api\CouponController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\PasswordResetController;
+use App\Http\Controllers\Api\PaymentMethodController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\WebhookController;
@@ -48,8 +49,20 @@ Route::middleware(['auth:sanctum', 'api'])->group(function () {
     Route::post('/orders', [OrderController::class, 'store']);
     Route::post('/orders/{orderNumber}/cancel', [OrderController::class, 'cancel']);
 
+    // Saved cards (Stripe references only; card data never touches this server)
+    Route::middleware(['throttle:payments', 'no-store'])->group(function () {
+        Route::get('/payment-methods', [PaymentMethodController::class, 'index']);
+        Route::post('/payment-methods/setup-intent', [PaymentMethodController::class, 'setupIntent']);
+        Route::post('/payment-methods', [PaymentMethodController::class, 'store']);
+        Route::put('/payment-methods/{id}/default', [PaymentMethodController::class, 'setDefault'])->whereNumber('id');
+        Route::delete('/payment-methods/{id}', [PaymentMethodController::class, 'destroy'])->whereNumber('id');
+    });
+
     // Checkout
-    Route::post('/checkout/payment-intent', [CheckoutController::class, 'createPaymentIntent']);
+    Route::middleware(['throttle:payments', 'no-store'])->group(function () {
+        Route::get('/checkout/requirements', [CheckoutController::class, 'requirements']);
+        Route::post('/checkout/payment-intent', [CheckoutController::class, 'createPaymentIntent']);
+    });
 
     // Coupons
     Route::post('/products/{slug}/reviews', [ReviewController::class, 'store']);

@@ -31,6 +31,8 @@ return [
     'stripe' => [
         'secret' => env('STRIPE_SECRET'),
         'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
+        // Only for pointing tests at a local stripe-mock; leave empty in real environments.
+        'api_base' => env('STRIPE_API_BASE'),
     ],
 
     'slack' => [

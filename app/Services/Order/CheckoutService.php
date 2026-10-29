@@ -2,11 +2,14 @@
 
 namespace App\Services\Order;
 
+use App\Http\Requests\Api\StoreOrderRequest;
 use App\Models\Order;
 use App\Models\OrderAddress;
 use App\Models\OrderItem;
+use App\Models\PaymentMethod;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Models\User;
 use App\Services\Contracts\PaymentGatewayInterface;
 use App\Services\Contracts\StockServiceInterface;
 use Illuminate\Support\Facades\Auth;
@@ -15,6 +18,9 @@ use Illuminate\Support\Str;
 
 class CheckoutService
 {
+    /** Stripe's minimum charge is about 0.50 in USD/EUR. */
+    private const MIN_CARD_TOTAL = 0.50;
+
     public function __construct(
         private PaymentGatewayInterface $paymentGateway,
         private StockServiceInterface $stockService,
@@ -69,6 +75,10 @@ class CheckoutService
         $billingAddressData = $validatedData['billing_address'] ?? $validatedData['shipping_address'];
         $billingAddress = OrderAddressDTO::fromArray($billingAddressData, 'billing');
 
+        // Card payments are validated before anything is written or reserved.
+        $isCard = in_array($validatedData['payment_method'], StoreOrderRequest::CARD_METHODS, true);
+        $savedCard = $isCard ? $this->resolveSavedCard($user, $validatedData['payment_method_id'] ?? null, $total) : null;
+
         $orderData = new OrderDataDTO(
             userId: $user->id,
             email: $user->email,
@@ -86,7 +96,7 @@ class CheckoutService
             currency: config('shop.currency', 'USD'),
         );
 
-        return DB::transaction(function () use ($orderData, $items, $idempotencyKey, $validatedData, $orderService, $coupon) {
+        return DB::transaction(function () use ($orderData, $items, $idempotencyKey, $orderService, $coupon, $savedCard, $total, $user) {
             // Create order with pending payment status
             $order = Order::create(array_merge($orderData->toArray(), [
                 'order_number' => 'ORD-'.strtoupper(Str::random(8)),
@@ -111,9 +121,11 @@ class CheckoutService
             OrderAddress::create(array_merge($orderData->shippingAddress->toArray(), ['order_id' => $order->id]));
             OrderAddress::create(array_merge($orderData->billingAddress->toArray(), ['order_id' => $order->id]));
 
-            // Create payment intent for card payments
+            // Create the card PaymentIntent with the customer's saved card; the browser confirms it (3-D Secure).
             $paymentIntent = null;
-            if ($validatedData['payment_method'] === 'credit_card' || $validatedData['payment_method'] === 'stripe') {
+            if ($savedCard) {
+                $this->paymentGateway->updatePaymentMethodBilling($savedCard->stripe_payment_method_id, $this->stripeAddress($orderData->billingAddress));
+
                 $paymentIntent = $this->paymentGateway->createPaymentIntent(
                     $total,
                     config('shop.currency', 'USD'),
@@ -121,6 +133,12 @@ class CheckoutService
                         'order_id' => $order->id,
                         'order_number' => $order->order_number,
                         'user_id' => $user->id,
+                    ],
+                    [
+                        'customer' => $user->stripe_customer_id,
+                        'payment_method' => $savedCard->stripe_payment_method_id,
+                        'shipping' => $this->stripeAddress($orderData->shippingAddress),
+                        'idempotency_key' => "order-{$order->order_number}",
                     ]
                 );
 
@@ -140,6 +158,41 @@ class CheckoutService
                 'payment_intent' => $paymentIntent,
             ];
         });
+    }
+
+    private function resolveSavedCard(User $user, ?int $paymentMethodId, float $total): PaymentMethod
+    {
+        $card = $paymentMethodId ? PaymentMethod::where('user_id', $user->id)->find($paymentMethodId) : null;
+
+        if (! $card || ! $user->stripe_customer_id) {
+            throw new \InvalidArgumentException('Invalid payment method');
+        }
+
+        if ($card->isExpired()) {
+            throw new \InvalidArgumentException('This card has expired');
+        }
+
+        if ($total < self::MIN_CARD_TOTAL) {
+            throw new \InvalidArgumentException('The order total is too low to pay by card');
+        }
+
+        return $card;
+    }
+
+    /** @return array{name: string, address: array<string, ?string>} */
+    private function stripeAddress(OrderAddressDTO $address): array
+    {
+        return [
+            'name' => trim($address->firstName.' '.$address->lastName),
+            'address' => [
+                'line1' => $address->addressLine1,
+                'line2' => $address->addressLine2,
+                'city' => $address->city,
+                'state' => $address->state,
+                'postal_code' => $address->postalCode,
+                'country' => $address->country,
+            ],
+        ];
     }
 
     private function prepareOrderItems(array $cartItems): array

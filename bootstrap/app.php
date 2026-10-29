@@ -3,11 +3,14 @@
 use App\Http\Middleware\ApiRateLimiter;
 use App\Http\Middleware\AuthRateLimiter;
 use App\Http\Middleware\CartToken;
+use App\Http\Middleware\NoStore;
 use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Stripe\Exception\ApiErrorException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -22,6 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'api.rate-limiter' => ApiRateLimiter::class,
             'security.headers' => SecurityHeaders::class,
             'cart.token' => CartToken::class,
+            'no-store' => NoStore::class,
         ]);
 
         $middleware->group('api', [
@@ -35,6 +39,13 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
+        // Never leak Stripe error details to clients; log only identifiers useful for support.
+        $exceptions->render(function (ApiErrorException $e, Request $request) {
+            Log::error('Stripe API error', ['type' => $e::class, 'code' => $e->getStripeCode(), 'request_id' => $e->getRequestId()]);
+
+            return response()->json(['message' => 'The payment provider is unavailable. Please try again.'], 502);
+        });
+
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
