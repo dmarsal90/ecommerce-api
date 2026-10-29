@@ -1,0 +1,109 @@
+<?php
+
+namespace App\Filament\Resources;
+
+use App\Filament\Resources\CategoryResource\Pages;
+use App\Models\Category;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Table;
+use Illuminate\Support\Str;
+
+class CategoryResource extends Resource
+{
+    protected static ?string $model = Category::class;
+
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-folder';
+
+    protected static string|\UnitEnum|null $navigationGroup = 'Catalog';
+
+    protected static ?int $navigationSort = 1;
+
+    public static function form(Schema $schema): Schema
+    {
+        return $schema
+            ->schema([
+                TextInput::make('name')
+                    ->required()
+                    ->maxLength(255)
+                    ->live(onBlur: true)
+                    ->afterStateUpdated(fn (string $operation, $state, callable $set) => $operation === 'create' ? $set('slug', Str::slug($state)) : null),
+
+                TextInput::make('slug')
+                    ->required()
+                    ->maxLength(255)
+                    ->unique(ignoreRecord: true),
+
+                Textarea::make('description')
+                    ->columnSpanFull(),
+
+                FileUpload::make('image')
+                    ->image()
+                    ->directory('categories'),
+
+                Select::make('parent_id')
+                    ->label('Parent Category')
+                    ->relationship('parent', 'name')
+                    ->searchable()
+                    ->preload(),
+
+                TextInput::make('sort_order')
+                    ->numeric()
+                    ->default(0),
+
+                Toggle::make('is_active')
+                    ->default(true),
+            ]);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->columns([
+                TextColumn::make('name')->searchable(),
+                TextColumn::make('slug')->searchable(),
+                ImageColumn::make('image')->circular(),
+                TextColumn::make('parent.name')->label('Parent'),
+                IconColumn::make('is_active')->boolean(),
+                TextColumn::make('sort_order')->sortable(),
+                TextColumn::make('created_at')->dateTime()->sortable(),
+            ])
+            ->actions([
+                ViewAction::make()->iconButton()->color('info'),
+                EditAction::make()->iconButton()->color('warning'),
+                DeleteAction::make()
+                    ->icon('heroicon-o-trash')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->iconButton(),
+            ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            //
+        ];
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => Pages\ListCategories::route('/'),
+            'create' => Pages\CreateCategory::route('/create'),
+            'view' => Pages\ViewCategory::route('/{record}'),
+            'edit' => Pages\EditCategory::route('/{record}/edit'),
+        ];
+    }
+}
