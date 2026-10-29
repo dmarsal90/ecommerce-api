@@ -10,9 +10,9 @@ class SalesChart extends ChartWidget
 {
     protected ?string $heading = 'Sales Overview (Last 30 Days)';
 
-    protected static ?int $sort = 4;
+    protected static ?int $sort = 2;
 
-    protected int|string|array $columnSpan = 'full';
+    protected ?string $maxHeight = '260px';
 
     protected function getData(): array
     {

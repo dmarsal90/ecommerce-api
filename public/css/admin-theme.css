@@ -7,17 +7,17 @@
     --st-bg: #f5f6fb;
     --st-surface: #ffffff;
     --st-border: rgb(15 23 42 / 0.07);
-    --st-shadow: 0 1px 2px rgb(15 23 42 / 0.04), 0 8px 24px -12px rgb(15 23 42 / 0.12);
-    --st-shadow-hover: 0 2px 4px rgb(15 23 42 / 0.05), 0 16px 32px -14px rgb(79 70 229 / 0.28);
+    --st-shadow: -6px 10px 24px -12px rgb(15 23 42 / 0.22);
+    --st-shadow-hover: -8px 16px 32px -12px rgb(15 23 42 / 0.3);
     --st-ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .dark {
-    --st-bg: #0b0f1d;
-    --st-surface: #121830;
-    --st-border: rgb(255 255 255 / 0.07);
-    --st-shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px -12px rgb(0 0 0 / 0.5);
-    --st-shadow-hover: 0 2px 4px rgb(0 0 0 / 0.35), 0 16px 32px -14px rgb(99 102 241 / 0.4);
+    --st-bg: #000;
+    --st-surface: rgb(255 255 255 / 0.06);
+    --st-border: rgb(255 255 255 / 0.1);
+    --st-shadow: inset 1px 1px 0 rgb(255 255 255 / 0.18), -10px 14px 28px -10px rgb(0 0 0 / 0.95);
+    --st-shadow-hover: inset 1px 1px 0 rgb(255 255 255 / 0.24), -14px 20px 34px -10px rgb(0 0 0 / 1);
 }
 
 /* Base ------------------------------------------------------------ */
@@ -204,6 +204,75 @@
     letter-spacing: -0.03em;
 }
 
+/* Dark glass ------------------------------------------------------ */
+/* Soft neutral light behind the glass: blur only reads when there is something to blur. */
+.dark .fi-body {
+    background:
+        radial-gradient(520px 420px at 4% 28%, rgb(255 255 255 / 0.2), transparent 70%),
+        radial-gradient(640px 460px at 96% 4%, rgb(255 255 255 / 0.16), transparent 70%),
+        radial-gradient(760px 420px at 62% 104%, rgb(255 255 255 / 0.14), transparent 70%),
+        #000;
+    background-attachment: fixed;
+}
+
+.dark .fi-section,
+.dark .fi-ta-ctn,
+.dark .fi-wi-stats-overview-stat {
+    background: linear-gradient(150deg, rgb(255 255 255 / 0.2), rgb(255 255 255 / 0.1));
+    border-color: rgb(255 255 255 / 0.16);
+    backdrop-filter: blur(22px) saturate(150%);
+    -webkit-backdrop-filter: blur(22px) saturate(150%);
+}
+
+.dark .fi-sidebar,
+.dark .fi-topbar {
+    background: rgb(255 255 255 / 0.07);
+    border-color: rgb(255 255 255 / 0.14);
+    backdrop-filter: blur(22px) saturate(150%);
+    -webkit-backdrop-filter: blur(22px) saturate(150%);
+}
+
+.dark .fi-ta-header-cell {
+    background: rgb(255 255 255 / 0.04);
+}
+
+.dark .fi-ta-row:hover {
+    background: rgb(255 255 255 / 0.05);
+}
+
+.dark .fi-simple-layout {
+    background:
+        radial-gradient(700px 500px at 15% 10%, rgb(255 255 255 / 0.09), transparent 60%),
+        radial-gradient(600px 500px at 90% 90%, rgb(255 255 255 / 0.06), transparent 60%),
+        #000;
+}
+
+.dark .fi-simple-main {
+    background: var(--st-surface);
+    box-shadow: var(--st-shadow);
+}
+
+/* Plain forms (no Section inside) get their own card so they don't float on the page background. */
+.fi-page form.fi-sc-form:not(:has(.fi-section)) {
+    padding: 1.5rem;
+    border: 1px solid var(--st-border);
+    border-radius: var(--st-radius);
+    background: var(--st-surface);
+    box-shadow: var(--st-shadow);
+}
+
+.dark .fi-page form.fi-sc-form:not(:has(.fi-section)) {
+    background: linear-gradient(150deg, rgb(255 255 255 / 0.2), rgb(255 255 255 / 0.1));
+    border-color: rgb(255 255 255 / 0.16);
+    backdrop-filter: blur(22px) saturate(150%);
+    -webkit-backdrop-filter: blur(22px) saturate(150%);
+}
+
+.dark .fi-wi-stats-overview-stat-label,
+.dark .fi-wi-stats-overview-stat-description {
+    color: rgb(255 255 255 / 0.85);
+}
+
 /* Scrollbars ------------------------------------------------------ */
 * {
     scrollbar-width: thin;
@@ -222,4 +291,27 @@
     .fi-wi-stats-overview-stat:hover {
         transform: none;
     }
+}
+
+/* Toasts ---------------------------------------------------------- */
+.fi-no-notification:not(.fi-inline) {
+    max-width: 30rem;
+    padding: 1.25rem 1.5rem;
+    gap: 1rem;
+    border-radius: var(--st-radius);
+}
+
+.fi-no-notification .fi-no-notification-icon {
+    width: 2rem;
+    height: 2rem;
+}
+
+.fi-no-notification .fi-no-notification-title {
+    font-size: 1.0625rem;
+    line-height: 1.5rem;
+}
+
+.fi-no-notification .fi-no-notification-body {
+    font-size: 0.9375rem;
+    line-height: 1.375rem;
 }

@@ -119,7 +119,9 @@ Funciona para invitados (con `X-Cart-Token`) y para usuarios (con Bearer).
 }
 ```
 
-- `billing_address` es opcional (por defecto, la de envío). `coupon_code` es opcional; si no es válido, expirado o agotado, la petición devuelve 422 y no se crea el pedido.
+- Direcciones: en lugar de `shipping_address` / `billing_address` en línea se pueden enviar `shipping_address_id` / `billing_address_id` (direcciones guardadas del usuario). Con tarjeta, la de facturación es obligatoria. Con `bank_transfer`, `billing_address` es opcional (por defecto, la de envío).
+- Tarjeta: `payment_method` `credit_card` o `stripe` exige `payment_method_id` (tarjeta guardada, no caducada) y solo se acepta en `/checkout/payment-intent`; `/orders` devuelve 422. Los datos de tarjeta en crudo se rechazan: solo Stripe.js los maneja.
+- `billing_address` es opcional sin tarjeta (por defecto, la de envío). `coupon_code` es opcional; si no es válido, expirado o agotado, la petición devuelve 422 y no se crea el pedido.
 - `idempotency_key` evita pedidos duplicados al reintentar: repetir la misma clave devuelve el pedido ya creado.
 - El precio, el impuesto, el envío y el descuento los calcula siempre el servidor; el front solo los muestra. Envío gratis por encima de `free_shipping_threshold` o con un cupón `free_shipping`.
 - El stock se descuenta al crear el pedido.
@@ -128,6 +130,17 @@ Funciona para invitados (con `X-Cart-Token`) y para usuarios (con Bearer).
 **Pedido:** `{ id, order_number, email, phone, status, payment_status, fulfillment_status, subtotal, tax, shipping, discount, total, currency, payment_method, notes, cancelled_at, shipped_at, delivered_at, items, addresses, created_at, updated_at }`. Cada `item`: `{ id, order_id, product_id, variant_id, quantity, price, compare_at_price, total, product_name, variant_name, sku, product, variant }`.
 
 **Estados de pago.** Tras confirmar el pago con Stripe, el estado del pedido pasa a `paid` mediante el webhook (`POST /webhooks/stripe`, solo para Stripe; el front no lo usa). Hay que consultar `GET /orders/{orderNumber}` para ver el estado final.
+
+**3-D Secure.** El PaymentIntent se crea con la tarjeta guardada pero sin confirmar, y se pide 3DS siempre que la tarjeta lo soporte. El front debe confirmarlo en el navegador:
+
+```js
+const { error, paymentIntent } = await stripe.confirmCardPayment(client_secret);
+// Stripe.js abre el reto 3DS si hace falta. Sin error y status 'succeeded' → pago hecho.
+```
+
+- Si hay `error` (tarjeta rechazada, reto fallido o cancelado), mostrar el mensaje y permitir reintentar con `stripe.confirmCardPayment` sobre el mismo `client_secret`, sin crear otro pedido.
+- El resultado de Stripe.js es solo informativo: el estado real lo marca el webhook. Tras confirmar, consultar `GET /orders/{orderNumber}` hasta ver `payment_status: paid` (puede tardar unos segundos).
+- Un pedido con tarjeta que no se paga en 60 min se cancela solo y se libera el stock.
 
 ## Reseñas (requieren Bearer)
 
