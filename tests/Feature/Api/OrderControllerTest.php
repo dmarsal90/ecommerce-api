@@ -219,6 +219,7 @@ class OrderControllerTest extends TestCase
         $order = Order::factory()->create([
             'user_id' => $this->user->id,
             'status' => 'pending',
+            'payment_status' => 'pending',
         ]);
         $order->items()->create([
             'product_id' => $this->product->id,
