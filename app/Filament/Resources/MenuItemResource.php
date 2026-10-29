@@ -7,8 +7,16 @@ use App\Models\MenuItem;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
 class MenuItemResource extends Resource
@@ -23,7 +31,44 @@ class MenuItemResource extends Resource
     {
         return $schema
             ->schema([
-                // TODO: form schema
+                Grid::make(2)->schema([
+                    Select::make('menu_id')
+                        ->label('Menu')
+                        ->relationship('menu', 'name')
+                        ->required()
+                        ->live()
+                        ->preload(),
+
+                    Select::make('parent_id')
+                        ->label('Parent item')
+                        ->relationship('parent', 'label', fn ($query, Get $get) => $query->where('menu_id', $get('menu_id')))
+                        ->placeholder('None (top level)'),
+
+                    TextInput::make('label')
+                        ->required()
+                        ->maxLength(255),
+
+                    TextInput::make('url')
+                        ->maxLength(255)
+                        ->placeholder('/collections/spring'),
+
+                    Select::make('target')
+                        ->options(['_self' => 'Same tab', '_blank' => 'New tab'])
+                        ->default('_self')
+                        ->required(),
+
+                    TextInput::make('sort_order')
+                        ->numeric()
+                        ->default(0)
+                        ->minValue(0),
+
+                    Toggle::make('open_in_new_tab')
+                        ->label('Open in new tab'),
+
+                    Toggle::make('is_active')
+                        ->label('Active')
+                        ->default(true),
+                ]),
             ]);
     }
 
@@ -31,7 +76,16 @@ class MenuItemResource extends Resource
     {
         return $table
             ->columns([
-                // Add your columns here
+                TextColumn::make('label')->searchable()->sortable(),
+                TextColumn::make('menu.name')->label('Menu')->badge()->sortable(),
+                TextColumn::make('parent.label')->label('Parent')->placeholder('Top level'),
+                TextColumn::make('url')->placeholder('-')->limit(40),
+                TextColumn::make('sort_order')->sortable(),
+                IconColumn::make('is_active')->label('Active')->boolean(),
+            ])
+            ->defaultSort('sort_order')
+            ->filters([
+                SelectFilter::make('menu_id')->label('Menu')->relationship('menu', 'name'),
             ])
             ->actions([
                 ViewAction::make()->iconButton()->color('info'),
