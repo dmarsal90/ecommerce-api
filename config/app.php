@@ -15,6 +15,8 @@ return [
 
     'name' => env('APP_NAME', 'Laravel'),
 
+    'admin_path' => env('ADMIN_PATH', 'admin'),
+
     'frontend_url' => env('FRONTEND_URL', 'http://localhost:3000'),
 
     /*
