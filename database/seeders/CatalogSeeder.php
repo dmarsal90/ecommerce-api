@@ -104,7 +104,7 @@ class CatalogSeeder extends Seeder
 
         $brands = [];
         foreach ($data as $brandData) {
-            $brands[] = Brand::firstOrCreate(['slug' => $brandData['slug']], $brandData);
+            $brands[] = Brand::firstOrCreate(['slug' => $brandData['slug']], $brandData + ['logo' => DemoPhoto::path('brand-'.$brandData['slug'], 'svg')]);
         }
 
         return $brands;
