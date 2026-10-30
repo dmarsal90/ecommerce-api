@@ -44,6 +44,7 @@ Las respuestas de esta sección van envueltas en `{ "data": ... }`.
 | Método | Ruta | Descripción |
 |---|---|---|
 | GET | `/products` | Listado paginado con filtros (abajo) |
+| GET | `/products/filters` | Opciones de filtro: `colors` (`value`, `slug`, `color_code`) y `sizes` |
 | GET | `/products/featured` · `/new-arrivals` · `/on-sale` | Listados rápidos |
 | GET | `/products/{slug}` | Detalle: añade `collections`, `tags` y `reviews` aprobadas |
 | GET | `/products/{slug}/related` | Productos relacionados |
@@ -53,7 +54,7 @@ Las respuestas de esta sección van envueltas en `{ "data": ... }`.
 | GET | `/brands` · `/brands/featured` · `/brands/{slug}` · `/brands/{slug}/products` | Marcas |
 | GET | `/collections` · `/collections/{slug}` · `/collections/{slug}/products` | Colecciones |
 
-**Filtros de `GET /products`** (todos opcionales): `search` (nombre y descripciones), `category` y `brand` (slug), `gender` (`men|women|kids|unisex`), `season`, `featured`, `on_sale`, `min_price`, `max_price`, `sort` (`price_asc|price_desc|name_asc|name_desc|oldest|newest`), `per_page`.
+**Filtros de `GET /products`** (todos opcionales): `search` (nombre y descripciones), `category` y `brand` (slug), `gender` (`men|women|kids|unisex`), `season`, `featured`, `on_sale`, `min_price`, `max_price`, `color[]` y `size[]` (slugs; una misma variante activa debe cumplir todos), `sort` (`price_asc|price_desc|name_asc|name_desc|oldest|newest`), `per_page`.
 
 **Producto:** `{ id, name, slug, sku, description, short_description, price, compare_at_price, is_active, is_featured, gender, season, quantity, track_quantity, category, brand, images, variants, created_at, updated_at }`.
 

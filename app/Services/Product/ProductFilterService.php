@@ -116,6 +116,20 @@ class ProductFilterService implements ProductFilterServiceInterface
             $query->where('price', '<=', $filters['max_price']);
         }
 
+        if (! empty($filters['color']) || ! empty($filters['size'])) {
+            // One variant must match every chosen attribute, so "black + L" means a black L exists.
+            $query->whereHas('variants', function ($variant) use ($filters) {
+                $variant->where('is_active', true);
+
+                foreach (['color', 'size'] as $attribute) {
+                    if (! empty($filters[$attribute])) {
+                        $variant->whereHas('attributeValues', fn ($q) => $q->whereIn('product_attribute_values.slug', $filters[$attribute])
+                            ->whereHas('attribute', fn ($a) => $a->where('slug', $attribute)));
+                    }
+                }
+            });
+        }
+
         if (! empty($filters['search'])) {
             $search = $filters['search'];
             $query->where(function ($q) use ($search) {
