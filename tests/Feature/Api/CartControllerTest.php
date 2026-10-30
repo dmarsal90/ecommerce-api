@@ -275,4 +275,16 @@ class CartControllerTest extends TestCase
         $response->assertStatus(200)
             ->assertJsonPath('count', 3);
     }
+
+    public function test_cart_items_include_loadable_product_image_urls(): void
+    {
+        $product = Product::factory()->create(['price' => 50, 'quantity' => 100, 'track_quantity' => true, 'is_active' => true]);
+        $product->images()->create(['path' => 'demo/tee.jpg', 'alt_text' => 'Tee', 'sort_order' => 1]);
+
+        $this->postJson('/api/cart', ['product_id' => $product->id, 'quantity' => 1])->assertOk();
+
+        $image = $this->getJson('/api/cart')->assertOk()->json('data.items.0.product.images.0');
+        $this->assertStringEndsWith('/storage/demo/tee.jpg', $image['url']);
+        $this->assertSame('Tee', $image['alt']);
+    }
 }
