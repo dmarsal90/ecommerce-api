@@ -46,7 +46,7 @@ Las respuestas de esta sección van envueltas en `{ "data": ... }`.
 | Método | Ruta | Descripción |
 |---|---|---|
 | GET | `/products` | Listado paginado con filtros (abajo) |
-| GET | `/products/filters` | Opciones de filtro: `colors` (`value`, `slug`, `color_code`) y `sizes` |
+| GET | `/products/filters` | Opciones de filtro: `colors` (`value`, `slug`, `color_code`) y `sizes`, ya ordenadas (XS → XXL) |
 | GET | `/products/featured` · `/new-arrivals` · `/on-sale` | Listados rápidos |
 | GET | `/products/{slug}` | Detalle: añade `collections`, `tags` y `reviews` aprobadas |
 | GET | `/products/{slug}/related` | Productos relacionados |

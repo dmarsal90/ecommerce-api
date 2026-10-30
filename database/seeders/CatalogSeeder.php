@@ -257,14 +257,14 @@ class CatalogSeeder extends Seeder
             'sort_order' => 2,
         ]);
 
-        $clothingSizes = Size::where('size_group_id', $sizeGroups[0]->id)->get();
-        foreach ($clothingSizes as $index => $size) {
+        $clothingSizes = Size::where('size_group_id', $sizeGroups[0]->id)->orderBy('sort_order')->get();
+        foreach ($clothingSizes as $size) {
             ProductAttributeValue::firstOrCreate(
                 ['attribute_id' => $sizeAttribute->id, 'value' => $size->value],
                 [
                     'slug' => $size->slug,
                     'size_id' => $size->id,
-                    'sort_order' => $index + 1,
+                    'sort_order' => $size->sort_order,
                 ]
             );
         }
