@@ -5,7 +5,10 @@ namespace Tests\Feature\Api;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductAttribute;
+use App\Models\ProductAttributeValue;
 use App\Models\ProductImage;
+use App\Models\ProductVariant;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -234,5 +237,43 @@ class ProductControllerTest extends TestCase
         foreach ($data as $related) {
             $this->assertNotEquals($product->id, $related['id']);
         }
+    }
+
+    public function test_can_filter_products_by_color_and_size_on_the_same_variant(): void
+    {
+        $color = ProductAttribute::create(['name' => 'Color', 'slug' => 'color']);
+        $size = ProductAttribute::create(['name' => 'Size', 'slug' => 'size']);
+        $black = ProductAttributeValue::create(['attribute_id' => $color->id, 'value' => 'Black', 'slug' => 'black']);
+        $large = ProductAttributeValue::create(['attribute_id' => $size->id, 'value' => 'L', 'slug' => 'l']);
+        $small = ProductAttributeValue::create(['attribute_id' => $size->id, 'value' => 'S', 'slug' => 's']);
+
+        $match = Product::factory()->create(['is_active' => true]);
+        $other = Product::factory()->create(['is_active' => true]);
+        $this->variantWith($match, [$black, $large]);
+        $this->variantWith($other, [$black, $small]);
+
+        $this->getJson('/api/products?color[]=black&size[]=l')
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.id', $match->id);
+
+        $this->getJson('/api/products?color[]=nope')->assertUnprocessable();
+    }
+
+    public function test_lists_color_and_size_options(): void
+    {
+        $color = ProductAttribute::create(['name' => 'Color', 'slug' => 'color']);
+        ProductAttributeValue::create(['attribute_id' => $color->id, 'value' => 'Black', 'slug' => 'black', 'color_code' => '#000000']);
+
+        $this->getJson('/api/products/filters')
+            ->assertOk()
+            ->assertJsonPath('colors.0.slug', 'black')
+            ->assertJsonPath('sizes', []);
+    }
+
+    private function variantWith(Product $product, array $values): void
+    {
+        $variant = ProductVariant::factory()->create(['product_id' => $product->id, 'is_active' => true]);
+        $variant->attributeValues()->attach(collect($values)->pluck('id'));
     }
 }
