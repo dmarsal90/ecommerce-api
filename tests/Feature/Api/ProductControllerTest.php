@@ -291,4 +291,15 @@ class ProductControllerTest extends TestCase
         $this->assertSame([1, 2, 3], array_column($images, 'position'));
         $this->assertSame('https://cdn.example/remote.jpg', $images[2]['url']);
     }
+
+    public function test_size_options_follow_their_sort_order_not_the_alphabet(): void
+    {
+        $size = ProductAttribute::create(['name' => 'Size', 'slug' => 'size']);
+        foreach (['XL' => 4, 'S' => 2, 'M' => 3, 'XS' => 1] as $value => $order) {
+            ProductAttributeValue::create(['attribute_id' => $size->id, 'value' => $value, 'slug' => strtolower($value), 'sort_order' => $order]);
+        }
+
+        $this->getJson('/api/products/filters')->assertOk()
+            ->assertJsonPath('sizes.*.value', ['XS', 'S', 'M', 'XL']);
+    }
 }

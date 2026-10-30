@@ -16,6 +16,7 @@ class ProductVariantAttributeValueResource extends JsonResource
             'value' => $this->value,
             'slug' => $this->slug,
             'color_code' => $this->color_code,
+            'sort_order' => $this->sort_order,
             'attribute' => $this->whenLoaded('attribute', fn () => new ProductAttributeResource($this->attribute)),
         ];
     }
