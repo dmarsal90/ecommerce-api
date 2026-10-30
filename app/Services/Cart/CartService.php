@@ -2,6 +2,7 @@
 
 namespace App\Services\Cart;
 
+use App\Http\Resources\Api\ProductImageResource;
 use App\Models\Cart;
 use App\Models\Product;
 use App\Models\ProductVariant;
@@ -204,11 +205,7 @@ class CartService
                     'sku' => $product->sku,
                     'price' => $product->price,
                     'compare_at_price' => $product->compare_at_price,
-                    'images' => $product->images->map(fn ($img) => [
-                        'id' => $img->id,
-                        'url' => $img->url,
-                        'alt' => $img->alt,
-                    ])->toArray(),
+                    'images' => ProductImageResource::collection($product->images)->resolve(),
                 ],
                 variant: $variant ? [
                     'id' => $variant->id,
