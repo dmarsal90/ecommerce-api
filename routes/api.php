@@ -96,6 +96,7 @@ Route::middleware('api')->group(function () {
 // Public product routes
 Route::middleware('api')->group(function () {
     Route::get('/products', [ProductController::class, 'index']);
+    Route::get('/products/filters', [ProductController::class, 'filters']);
     Route::get('/products/featured', [ProductController::class, 'featured']);
     Route::get('/products/new-arrivals', [ProductController::class, 'newArrivals']);
     Route::get('/products/on-sale', [ProductController::class, 'onSale']);

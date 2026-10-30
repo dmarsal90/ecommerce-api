@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\ProductFilterRequest;
 use App\Http\Resources\Api\ProductResource;
+use App\Models\ProductAttributeValue;
 use App\Services\Product\ProductFilterService;
 use Illuminate\Http\JsonResponse;
 
@@ -46,6 +47,15 @@ class ProductController extends Controller
         }
 
         return (new ProductResource($product))->response();
+    }
+
+    public function filters(): JsonResponse
+    {
+        $options = fn (string $attribute) => ProductAttributeValue::active()->ordered()
+            ->whereHas('attribute', fn ($q) => $q->where('slug', $attribute)->where('is_active', true))
+            ->get(['value', 'slug', 'color_code']);
+
+        return response()->json(['colors' => $options('color'), 'sizes' => $options('size')]);
     }
 
     public function featured(): JsonResponse
