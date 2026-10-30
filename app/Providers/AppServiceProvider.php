@@ -21,6 +21,7 @@ use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Mail\Markdown;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
@@ -59,7 +60,10 @@ class AppServiceProvider extends ServiceProvider
         // Card-testing and enumeration guard for every payment endpoint.
         RateLimiter::for('payments', fn (Request $request) => Limit::perMinute(10)->by($request->user()?->id ?: $request->ip()));
 
-        // Branded, translated emails; the language comes from User::preferredLocale().
+        // Branded, translated emails in the request's language (see SetLocale).
+        // Secured encoding keeps user-controlled values such as the name from being parsed as Markdown.
+        Markdown::withSecuredEncoding();
+
         VerifyEmail::toMailUsing(fn ($user, string $url) => (new MailMessage)
             ->subject(__('mail.verify_subject'))
             ->greeting(__('mail.hello', ['name' => $user->name]))
@@ -75,6 +79,5 @@ class AppServiceProvider extends ServiceProvider
             ->action(__('mail.reset_action'), config('app.frontend_url').'/reset-password?token='.$token.'&email='.urlencode($user->getEmailForPasswordReset()))
             ->line(__('mail.reset_expire', ['count' => config('auth.passwords.'.config('auth.defaults.passwords').'.expire')]))
             ->salutation(new HtmlString(__('mail.bye').'<br>'.e(config('app.name')))));
-
     }
 }

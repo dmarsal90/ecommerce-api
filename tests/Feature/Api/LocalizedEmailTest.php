@@ -25,10 +25,10 @@ class LocalizedEmailTest extends TestCase
         }
     }
 
-    public function test_the_verification_email_uses_the_language_chosen_at_registration(): void
+    public function test_the_verification_email_uses_the_active_language_of_the_request(): void
     {
-        $this->postJson('/api/register', [
-            'name' => 'Ana', 'email' => 'ana@example.com', 'locale' => 'es',
+        $this->withHeader('Accept-Language', 'es-ES,es;q=0.9,en;q=0.5')->postJson('/api/register', [
+            'name' => 'Ana', 'email' => 'ana@example.com',
             'password' => 'password123', 'password_confirmation' => 'password123',
         ])->assertCreated();
 
@@ -49,19 +49,31 @@ class LocalizedEmailTest extends TestCase
         $this->assertSame('Verify your email address', $this->lastEmail()->getSubject());
     }
 
-    public function test_an_unsupported_language_is_rejected(): void
+    public function test_an_unsupported_language_falls_back_to_english(): void
+    {
+        $this->withHeader('Accept-Language', 'ja')->postJson('/api/register', [
+            'name' => 'Ana', 'email' => 'ana@example.com',
+            'password' => 'password123', 'password_confirmation' => 'password123',
+        ])->assertCreated();
+
+        $this->assertSame('Verify your email address', $this->lastEmail()->getSubject());
+    }
+
+    public function test_a_name_cannot_inject_markdown_links_into_the_email(): void
     {
         $this->postJson('/api/register', [
-            'name' => 'Ana', 'email' => 'ana@example.com', 'locale' => 'xx',
+            'name' => '[Pay now](https://evil.example)', 'email' => 'victim@example.com',
             'password' => 'password123', 'password_confirmation' => 'password123',
-        ])->assertUnprocessable()->assertJsonValidationErrors('locale');
+        ])->assertCreated();
+
+        $this->assertStringNotContainsString('href="https://evil.example"', $this->lastEmail()->getHtmlBody());
     }
 
     public function test_the_reset_email_is_translated_and_links_to_the_storefront(): void
     {
-        User::factory()->create(['email' => 'luc@example.com', 'locale' => 'fr']);
+        User::factory()->create(['email' => 'luc@example.com']);
 
-        $this->postJson('/api/forgot-password', ['email' => 'luc@example.com'])->assertOk();
+        $this->withHeader('Accept-Language', 'fr')->postJson('/api/forgot-password', ['email' => 'luc@example.com'])->assertOk();
 
         $email = $this->lastEmail();
         $this->assertSame('Réinitialisez votre mot de passe', $email->getSubject());

@@ -26,7 +26,6 @@ class AuthController extends Controller
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'locale' => $request->locale,
             'password' => Hash::make($request->password),
         ]);
 
@@ -89,7 +88,7 @@ class AuthController extends Controller
             }
         }
 
-        $user->fill($request->only(['name', 'email', 'locale', 'password']));
+        $user->fill($request->only(['name', 'email', 'password']));
         $emailChanged = $user->isDirty('email');
         if ($emailChanged) {
             $user->email_verified_at = null;
