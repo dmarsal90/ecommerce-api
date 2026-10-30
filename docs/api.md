@@ -75,6 +75,7 @@ Las respuestas de esta sección van envueltas en `{ "data": ... }`.
 | POST | `/logout` | ✔ | Revoca el token actual |
 | GET | `/me` | ✔ | `{ user: { id, name, email, avatar_url, email_verified_at, addresses, ... } }` |
 | PUT | `/me` | ✔ | `name`, `email` (requiere `current_password`), `password` + `password_confirmation`. Cambiar el email lo deja sin verificar y envía un nuevo correo |
+| POST · DELETE | `/me/avatar` | ✔ | POST `multipart/form-data` con `avatar` (JPG, PNG o WebP; máx. **2 MB** y 4000×4000 px; SVG no). Se recorta a 256×256 y se guarda como WebP; devuelve `{ user }` con `avatar_url` (URL completa o `null`). DELETE la quita. 10 subidas por minuto |
 | GET · POST | `/addresses` | ✔ | Direcciones del usuario. POST: `type` (`billing|shipping`), `first_name`, `last_name`, `company`, `address_line_1`, `address_line_2`, `city`, `state`, `postal_code`, `country` (ISO-2), `phone`, `is_default` |
 | PUT · DELETE | `/addresses/{id}` | ✔ | Mismos campos, todos opcionales en PUT |
 

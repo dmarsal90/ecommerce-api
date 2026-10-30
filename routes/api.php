@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\AvatarController;
 use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\CategoryController;
@@ -38,6 +39,8 @@ Route::middleware(['auth:sanctum', 'api'])->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/email/resend', [EmailVerificationController::class, 'resend'])->middleware('throttle:6,1');
     Route::put('/me', [AuthController::class, 'update']);
+    Route::post('/me/avatar', [AvatarController::class, 'store'])->middleware('throttle:10,1');
+    Route::delete('/me/avatar', [AvatarController::class, 'destroy']);
 
     // Addresses
     Route::get('/addresses', [AuthController::class, 'addresses']);
