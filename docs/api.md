@@ -8,6 +8,8 @@ Base: `{API_URL}/api`. Todas las peticiones y respuestas son JSON; envía siempr
 
 **Carrito de invitado.** Cada respuesta de las rutas `/cart`, `/login` y `/register` incluye la cabecera `X-Cart-Token` (UUID). Guárdala y reenvíala en las siguientes peticiones; si falta o no es un UUID, el servidor genera una nueva. Con un Bearer válido el carrito pertenece al usuario, y al hacer `login` o `register` enviando el `X-Cart-Token` del invitado, sus artículos se fusionan con el carrito del usuario.
 
+**Idioma.** Envía `Accept-Language` con el idioma activo de la tienda (`en`, `es`, `it`, `de`, `pt`, `fr`); los correos (verificación y restablecer contraseña) se redactan en ese idioma, y en inglés si falta o no está soportado.
+
 **CORS.** Se permite el origen definido en `CORS_ALLOWED_ORIGINS` (por defecto `FRONTEND_URL`, `http://localhost:3000`). `X-Cart-Token` está expuesta a JavaScript.
 
 **Paginación.** Los listados paginados devuelven `{ data: [...], meta: { current_page, last_page, per_page, total }, links: {...} }`. Parámetro `page` en todos; `per_page` (máx. 100, por defecto 20) solo en `/products` y en los `/{slug}/products` de categorías, marcas y colecciones. Las reseñas se paginan de 10 en 10 y los pedidos con el tamaño por defecto del servidor.
@@ -64,13 +66,15 @@ Las respuestas de esta sección van envueltas en `{ "data": ... }`.
 
 | Método | Ruta | Auth | Cuerpo / notas |
 |---|---|---|---|
-| POST | `/register` | – | `name`, `email`, `password` (≥ 8), `password_confirmation`. 201 → `{ user, token }` |
+| POST | `/register` | – | `name`, `email`, `password` (≥ 8), `password_confirmation`. 201 → `{ user, token }`. La cuenta queda **sin verificar** (`email_verified_at: null`) y se envía un correo con el enlace de verificación |
 | POST | `/login` | – | `email`, `password`. → `{ user, token }`. 422 si las credenciales no son correctas |
 | POST | `/forgot-password` | – | `email`. Siempre 200 (no revela si el email existe). Envía un correo con enlace a `FRONTEND_URL/reset-password?token=…&email=…` |
 | POST | `/reset-password` | – | `token`, `email`, `password` (≥ 8), `password_confirmation`. Revoca todos los tokens del usuario |
+| GET | `/email/verify/{id}/{hash}` | – | Enlace firmado del correo (caduca en 60 min). Verifica el email y redirige a `FRONTEND_URL/verify-email?status=success\|already\|invalid` |
+| POST | `/email/resend` | ✔ | Reenvía el correo de verificación (6 por minuto). 200 también si ya estaba verificado |
 | POST | `/logout` | ✔ | Revoca el token actual |
 | GET | `/me` | ✔ | `{ user: { id, name, email, avatar_url, email_verified_at, addresses, ... } }` |
-| PUT | `/me` | ✔ | `name`, `email` (requiere `current_password`), `password` + `password_confirmation` |
+| PUT | `/me` | ✔ | `name`, `email` (requiere `current_password`), `password` + `password_confirmation`. Cambiar el email lo deja sin verificar y envía un nuevo correo |
 | GET · POST | `/addresses` | ✔ | Direcciones del usuario. POST: `type` (`billing|shipping`), `first_name`, `last_name`, `company`, `address_line_1`, `address_line_2`, `city`, `state`, `postal_code`, `country` (ISO-2), `phone`, `is_default` |
 | PUT · DELETE | `/addresses/{id}` | ✔ | Mismos campos, todos opcionales en PUT |
 
@@ -90,6 +94,8 @@ Funciona para invitados (con `X-Cart-Token`) y para usuarios (con Bearer).
 `{key}` es el campo `key` de cada artículo (`{ key, product_id, variant_id, quantity, price, total, product, variant }`).
 
 ## Cupones y checkout (requieren Bearer)
+
+**Email verificado.** `POST /orders` y `POST /checkout/payment-intent` responden `403 { "message": "Your email address is not verified." }` si el usuario no ha verificado su email (`email_verified_at` en `/me`). El resto de rutas, incluidos el carrito y los cupones, no lo exigen.
 
 | Método | Ruta | Descripción |
 |---|---|---|
