@@ -18,10 +18,13 @@ use App\Services\Order\PricingCalculator;
 use App\Services\Payment\StripePaymentGateway;
 use App\Services\Product\ProductFilterService;
 use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -56,6 +59,22 @@ class AppServiceProvider extends ServiceProvider
         // Card-testing and enumeration guard for every payment endpoint.
         RateLimiter::for('payments', fn (Request $request) => Limit::perMinute(10)->by($request->user()?->id ?: $request->ip()));
 
-        ResetPassword::createUrlUsing(fn ($user, string $token) => config('app.frontend_url').'/reset-password?token='.$token.'&email='.urlencode($user->getEmailForPasswordReset()));
+        // Branded, translated emails; the language comes from User::preferredLocale().
+        VerifyEmail::toMailUsing(fn ($user, string $url) => (new MailMessage)
+            ->subject(__('mail.verify_subject'))
+            ->greeting(__('mail.hello', ['name' => $user->name]))
+            ->line(__('mail.verify_intro', ['app' => config('app.name')]))
+            ->action(__('mail.verify_action'), $url)
+            ->line(__('mail.expire', ['count' => config('auth.verification.expire', 60)]))
+            ->salutation(new HtmlString(__('mail.bye').'<br>'.e(config('app.name')))));
+
+        ResetPassword::toMailUsing(fn ($user, string $token) => (new MailMessage)
+            ->subject(__('mail.reset_subject'))
+            ->greeting(__('mail.hello', ['name' => $user->name]))
+            ->line(__('mail.reset_intro', ['app' => config('app.name')]))
+            ->action(__('mail.reset_action'), config('app.frontend_url').'/reset-password?token='.$token.'&email='.urlencode($user->getEmailForPasswordReset()))
+            ->line(__('mail.reset_expire', ['count' => config('auth.passwords.'.config('auth.defaults.passwords').'.expire')]))
+            ->salutation(new HtmlString(__('mail.bye').'<br>'.e(config('app.name')))));
+
     }
 }

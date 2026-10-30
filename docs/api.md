@@ -64,7 +64,7 @@ Las respuestas de esta sección van envueltas en `{ "data": ... }`.
 
 | Método | Ruta | Auth | Cuerpo / notas |
 |---|---|---|---|
-| POST | `/register` | – | `name`, `email`, `password` (≥ 8), `password_confirmation`. 201 → `{ user, token }`. La cuenta queda **sin verificar** (`email_verified_at: null`) y se envía un correo con el enlace de verificación |
+| POST | `/register` | – | `name`, `email`, `password` (≥ 8), `password_confirmation`, `locale?` (`en|es|it|de|pt|fr`, idioma de los correos; por defecto inglés). 201 → `{ user, token }`. La cuenta queda **sin verificar** (`email_verified_at: null`) y se envía un correo con el enlace de verificación |
 | POST | `/login` | – | `email`, `password`. → `{ user, token }`. 422 si las credenciales no son correctas |
 | POST | `/forgot-password` | – | `email`. Siempre 200 (no revela si el email existe). Envía un correo con enlace a `FRONTEND_URL/reset-password?token=…&email=…` |
 | POST | `/reset-password` | – | `token`, `email`, `password` (≥ 8), `password_confirmation`. Revoca todos los tokens del usuario |
@@ -72,7 +72,7 @@ Las respuestas de esta sección van envueltas en `{ "data": ... }`.
 | POST | `/email/resend` | ✔ | Reenvía el correo de verificación (6 por minuto). 200 también si ya estaba verificado |
 | POST | `/logout` | ✔ | Revoca el token actual |
 | GET | `/me` | ✔ | `{ user: { id, name, email, avatar_url, email_verified_at, addresses, ... } }` |
-| PUT | `/me` | ✔ | `name`, `email` (requiere `current_password`), `password` + `password_confirmation`. Cambiar el email lo deja sin verificar y envía un nuevo correo |
+| PUT | `/me` | ✔ | `name`, `locale`, `email` (requiere `current_password`), `password` + `password_confirmation`. Cambiar el email lo deja sin verificar y envía un nuevo correo |
 | GET · POST | `/addresses` | ✔ | Direcciones del usuario. POST: `type` (`billing|shipping`), `first_name`, `last_name`, `company`, `address_line_1`, `address_line_2`, `city`, `state`, `postal_code`, `country` (ISO-2), `phone`, `is_default` |
 | PUT · DELETE | `/addresses/{id}` | ✔ | Mismos campos, todos opcionales en PUT |
 
