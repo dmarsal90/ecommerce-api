@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\CheckoutController;
 use App\Http\Controllers\Api\CollectionController;
 use App\Http\Controllers\Api\ContentController;
 use App\Http\Controllers\Api\CouponController;
+use App\Http\Controllers\Api\EmailVerificationController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\PasswordResetController;
 use App\Http\Controllers\Api\PaymentMethodController;
@@ -35,6 +36,7 @@ Route::middleware(['auth:sanctum', 'api'])->group(function () {
     });
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
+    Route::post('/email/resend', [EmailVerificationController::class, 'resend'])->middleware('throttle:6,1');
     Route::put('/me', [AuthController::class, 'update']);
 
     // Addresses
@@ -46,7 +48,7 @@ Route::middleware(['auth:sanctum', 'api'])->group(function () {
     // Orders
     Route::get('/orders', [OrderController::class, 'index']);
     Route::get('/orders/{orderNumber}', [OrderController::class, 'show']);
-    Route::post('/orders', [OrderController::class, 'store']);
+    Route::post('/orders', [OrderController::class, 'store'])->middleware('verified');
     Route::post('/orders/{orderNumber}/cancel', [OrderController::class, 'cancel']);
 
     // Saved cards (Stripe references only; card data never touches this server)
@@ -61,7 +63,7 @@ Route::middleware(['auth:sanctum', 'api'])->group(function () {
     // Checkout
     Route::middleware(['throttle:payments', 'no-store'])->group(function () {
         Route::get('/checkout/requirements', [CheckoutController::class, 'requirements']);
-        Route::post('/checkout/payment-intent', [CheckoutController::class, 'createPaymentIntent']);
+        Route::post('/checkout/payment-intent', [CheckoutController::class, 'createPaymentIntent'])->middleware('verified');
     });
 
     // Coupons
@@ -86,6 +88,10 @@ Route::middleware(['api', 'cart.token'])->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/forgot-password', [PasswordResetController::class, 'forgot']);
     Route::post('/reset-password', [PasswordResetController::class, 'reset']);
+    Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])
+        ->whereNumber('id')
+        ->middleware('throttle:6,1')
+        ->name('verification.verify');
 });
 
 // Public webhook routes (no auth required, but validated by Stripe signature)

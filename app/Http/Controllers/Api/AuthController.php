@@ -12,6 +12,7 @@ use App\Http\Resources\Api\AddressResource;
 use App\Http\Resources\Api\UserResource;
 use App\Models\User;
 use App\Services\Cart\CartService;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -26,8 +27,10 @@ class AuthController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'email_verified_at' => now(),
         ]);
+
+        // Sends the verification email; buying stays blocked until the link is opened.
+        event(new Registered($user));
 
         $token = $user->createToken('api-token')->plainTextToken;
         app(CartService::class)->mergeGuestCartToUser($user->id);
@@ -83,11 +86,18 @@ class AuthController extends Controller
                     'errors' => ['current_password' => ['The provided password does not match your current password.']],
                 ], 422);
             }
-            $user->email_verified_at = null;
         }
 
         $user->fill($request->only(['name', 'email', 'password']));
+        $emailChanged = $user->isDirty('email');
+        if ($emailChanged) {
+            $user->email_verified_at = null;
+        }
         $user->save();
+
+        if ($emailChanged) {
+            $user->sendEmailVerificationNotification();
+        }
 
         return response()->json([
             'user' => (new UserResource($user))->resolve(),
