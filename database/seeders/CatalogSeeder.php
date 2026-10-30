@@ -57,8 +57,8 @@ class CatalogSeeder extends Seeder
     private function seedCategories(): array
     {
         $data = [
-            ['name' => 'Men', 'slug' => 'men', 'description' => 'Men\'s clothing and accessories', 'sort_order' => 1],
-            ['name' => 'Women', 'slug' => 'women', 'description' => 'Women\'s clothing and accessories', 'sort_order' => 2],
+            ['name' => 'Men', 'slug' => 'men', 'description' => 'Men\'s streetwear', 'sort_order' => 1],
+            ['name' => 'Women', 'slug' => 'women', 'description' => 'Women\'s streetwear', 'sort_order' => 2],
             ['name' => 'Kids', 'slug' => 'kids', 'description' => 'Children\'s clothing', 'sort_order' => 3],
             ['name' => 'Accessories', 'slug' => 'accessories', 'description' => 'Accessories for all', 'sort_order' => 4],
             ['name' => 'Sale', 'slug' => 'sale', 'description' => 'Discounted items', 'sort_order' => 5],
@@ -74,14 +74,13 @@ class CatalogSeeder extends Seeder
         $womenCategory = Category::where('slug', 'women')->first();
 
         $subCategories = [
-            ['name' => 'T-Shirts', 'slug' => 'men-t-shirts', 'parent_id' => $menCategory->id, 'sort_order' => 1],
-            ['name' => 'Jeans', 'slug' => 'men-jeans', 'parent_id' => $menCategory->id, 'sort_order' => 2],
-            ['name' => 'Shirts', 'slug' => 'men-shirts', 'parent_id' => $menCategory->id, 'sort_order' => 3],
+            ['name' => 'Tees', 'slug' => 'men-tees', 'parent_id' => $menCategory->id, 'sort_order' => 1],
+            ['name' => 'Hoodies & Sweats', 'slug' => 'men-hoodies', 'parent_id' => $menCategory->id, 'sort_order' => 2],
+            ['name' => 'Denim', 'slug' => 'men-denim', 'parent_id' => $menCategory->id, 'sort_order' => 3],
             ['name' => 'Jackets', 'slug' => 'men-jackets', 'parent_id' => $menCategory->id, 'sort_order' => 4],
-            ['name' => 'Dresses', 'slug' => 'women-dresses', 'parent_id' => $womenCategory->id, 'sort_order' => 1],
-            ['name' => 'Tops', 'slug' => 'women-tops', 'parent_id' => $womenCategory->id, 'sort_order' => 2],
-            ['name' => 'Skirts', 'slug' => 'women-skirts', 'parent_id' => $womenCategory->id, 'sort_order' => 3],
-            ['name' => 'Outerwear', 'slug' => 'women-outerwear', 'parent_id' => $womenCategory->id, 'sort_order' => 4],
+            ['name' => 'Tops', 'slug' => 'women-tops', 'parent_id' => $womenCategory->id, 'sort_order' => 1],
+            ['name' => 'Denim', 'slug' => 'women-denim', 'parent_id' => $womenCategory->id, 'sort_order' => 2],
+            ['name' => 'Outerwear', 'slug' => 'women-outerwear', 'parent_id' => $womenCategory->id, 'sort_order' => 3],
         ];
 
         foreach ($subCategories as $catData) {
@@ -94,14 +93,13 @@ class CatalogSeeder extends Seeder
     private function seedBrands(): array
     {
         $data = [
-            ['name' => 'Nike', 'slug' => 'nike', 'description' => 'Just Do It', 'is_featured' => true, 'sort_order' => 1],
-            ['name' => 'Adidas', 'slug' => 'adidas', 'description' => 'Impossible is Nothing', 'is_featured' => true, 'sort_order' => 2],
-            ['name' => 'Puma', 'slug' => 'puma', 'description' => 'Forever Faster', 'is_featured' => false, 'sort_order' => 3],
-            ['name' => 'Under Armour', 'slug' => 'under-armour', 'description' => 'The Only Way is Through', 'is_featured' => false, 'sort_order' => 4],
-            ['name' => 'New Balance', 'slug' => 'new-balance', 'description' => 'Fearlessly Independent', 'is_featured' => true, 'sort_order' => 5],
-            ['name' => 'Levi\'s', 'slug' => 'levis', 'description' => 'Original Jeans', 'is_featured' => true, 'sort_order' => 6],
-            ['name' => 'Tommy Hilfiger', 'slug' => 'tommy-hilfiger', 'description' => 'Classic American Cool', 'is_featured' => false, 'sort_order' => 7],
-            ['name' => 'Calvin Klein', 'slug' => 'calvin-klein', 'description' => 'Modern Minimalist', 'is_featured' => false, 'sort_order' => 8],
+            ['name' => 'Sennitwo', 'slug' => 'sennitwo', 'description' => 'The house label', 'is_featured' => true, 'sort_order' => 1],
+            ['name' => 'Concrete Club', 'slug' => 'concrete-club', 'description' => 'Built for the block', 'is_featured' => true, 'sort_order' => 2],
+            ['name' => 'Night Shift', 'slug' => 'night-shift', 'description' => 'After dark essentials', 'is_featured' => true, 'sort_order' => 3],
+            ['name' => 'Low Tide Co.', 'slug' => 'low-tide', 'description' => 'Washed, worn, wide', 'is_featured' => true, 'sort_order' => 4],
+            ['name' => 'Alley Cat Supply', 'slug' => 'alley-cat', 'description' => 'Street cuts, no rules', 'is_featured' => true, 'sort_order' => 5],
+            ['name' => 'Paper Planes', 'slug' => 'paper-planes', 'description' => 'Easy daily layers', 'is_featured' => false, 'sort_order' => 6],
+            ['name' => 'Overgrown', 'slug' => 'overgrown', 'description' => 'Prints with attitude', 'is_featured' => false, 'sort_order' => 7],
         ];
 
         $brands = [];
@@ -115,11 +113,11 @@ class CatalogSeeder extends Seeder
     private function seedCollections(): array
     {
         $data = [
-            ['name' => 'Spring Collection 2024', 'slug' => 'spring-2024', 'description' => 'Fresh styles for spring', 'is_active' => true, 'sort_order' => 1],
-            ['name' => 'Summer Essentials', 'slug' => 'summer-essentials', 'description' => 'Light and breezy', 'is_active' => true, 'sort_order' => 2],
-            ['name' => 'Winter Warmers', 'slug' => 'winter-warmers', 'description' => 'Cozy up in style', 'is_active' => true, 'sort_order' => 3],
-            ['name' => 'Athleisure', 'slug' => 'athleisure', 'description' => 'Sporty meets casual', 'is_active' => true, 'sort_order' => 4],
-            ['name' => 'Denim Edit', 'slug' => 'denim-edit', 'description' => 'Best jeans collection', 'is_active' => true, 'sort_order' => 5],
+            ['name' => 'Drop 01', 'slug' => 'drop-01', 'description' => 'The first drop of the season', 'image' => DemoPhoto::path('overshirt-1'), 'is_active' => true, 'sort_order' => 1],
+            ['name' => 'Core Essentials', 'slug' => 'core-essentials', 'description' => 'Pieces you wear on repeat', 'image' => DemoPhoto::path('tee-1'), 'is_active' => true, 'sort_order' => 2],
+            ['name' => 'Winter Layers', 'slug' => 'winter-layers', 'description' => 'Hoods, jackets and heavy knits', 'image' => DemoPhoto::path('jacket-1'), 'is_active' => true, 'sort_order' => 3],
+            ['name' => 'After Dark', 'slug' => 'after-dark', 'description' => 'Black on black, built for the night', 'image' => DemoPhoto::path('hoodie-1'), 'is_active' => true, 'sort_order' => 4],
+            ['name' => 'Denim Edit', 'slug' => 'denim-edit', 'description' => 'Baggy, wide and washed', 'image' => DemoPhoto::path('jeans-1'), 'is_active' => true, 'sort_order' => 5],
         ];
 
         $collections = [];
@@ -258,14 +256,14 @@ class CatalogSeeder extends Seeder
             'sort_order' => 2,
         ]);
 
-        $clothingSizes = Size::where('size_group_id', $sizeGroups[0]->id)->get();
-        foreach ($clothingSizes as $index => $size) {
+        $clothingSizes = Size::where('size_group_id', $sizeGroups[0]->id)->orderBy('sort_order')->get();
+        foreach ($clothingSizes as $size) {
             ProductAttributeValue::firstOrCreate(
                 ['attribute_id' => $sizeAttribute->id, 'value' => $size->value],
                 [
                     'slug' => $size->slug,
                     'size_id' => $size->id,
-                    'sort_order' => $index + 1,
+                    'sort_order' => $size->sort_order,
                 ]
             );
         }
@@ -296,130 +294,199 @@ class CatalogSeeder extends Seeder
         ];
     }
 
+    /** Streetwear demo catalogue; each product has a matching local photo in storage/app/public/demo (see CREDITS.md). */
     private function seedProducts(array $categories, array $brands, array $collections, array $tags): array
     {
+        $category = collect($categories)->keyBy('slug');
+        $brand = collect($brands)->keyBy('slug');
+        $collection = collect($collections)->keyBy('slug');
+        $tag = collect($tags)->keyBy('slug');
+
         $productsData = [
             [
-                'name' => 'Classic Cotton T-Shirt',
-                'slug' => 'classic-cotton-t-shirt',
-                'sku' => 'TSH-001',
-                'description' => 'A comfortable classic cotton t-shirt for everyday wear.',
-                'short_description' => 'Classic fit cotton t-shirt',
-                'category_id' => $categories[0]->id, // Men -> T-Shirts
-                'brand_id' => $brands[0]->id, // Nike
-                'price' => 29.99,
-                'compare_at_price' => 39.99,
-                'cost_price' => 12.00,
-                'quantity' => 100,
-                'low_stock_threshold' => 10,
-                'material' => '100% Cotton',
-                'gender' => 'men',
-                'season' => 'all_season',
+                'name' => 'Graphic Hoodie',
+                'slug' => 'graphic-hoodie',
+                'sku' => 'HOD-001',
+                'description' => 'Heavyweight black hoodie with a hand-drawn graphic on the chest. Boxy fit, brushed fleece inside.',
+                'short_description' => 'Heavyweight hoodie with chest graphic',
+                'category_id' => $category['men-hoodies']->id,
+                'brand_id' => $brand['concrete-club']->id,
+                'price' => 79.00,
+                'compare_at_price' => null,
+                'cost_price' => 31.00,
+                'quantity' => 60,
+                'low_stock_threshold' => 8,
+                'material' => '80% Cotton, 20% Polyester',
+                'gender' => 'unisex',
+                'season' => 'autumn',
                 'is_active' => true,
                 'is_featured' => true,
                 'track_quantity' => true,
-                'collection_ids' => [$collections[0]->id, $collections[3]->id],
-                'tag_ids' => [$tags[0]->id, $tags[4]->id],
+                'collection_ids' => [$collection['drop-01']->id, $collection['winter-layers']->id, $collection['after-dark']->id],
+                'tag_ids' => [$tag['new-arrival']->id, $tag['best-seller']->id],
+                'images' => ['hoodie-1'],
             ],
             [
-                'name' => 'Slim Fit Jeans',
-                'slug' => 'slim-fit-jeans',
-                'sku' => 'JEA-001',
-                'description' => 'Modern slim fit jeans with stretch comfort.',
-                'short_description' => 'Slim fit stretch jeans',
-                'category_id' => $categories[1]->id, // Men -> Jeans
-                'brand_id' => $brands[5]->id, // Levi's
-                'price' => 79.99,
-                'compare_at_price' => 99.99,
-                'cost_price' => 35.00,
+                'name' => 'Mustard Crewneck Sweatshirt',
+                'slug' => 'mustard-crewneck-sweatshirt',
+                'sku' => 'SWE-001',
+                'description' => 'Relaxed crewneck in mustard with a small embroidered chest print. Pairs with everything baggy.',
+                'short_description' => 'Relaxed mustard crewneck',
+                'category_id' => $category['men-hoodies']->id,
+                'brand_id' => $brand['paper-planes']->id,
+                'price' => 64.00,
+                'compare_at_price' => 79.00,
+                'cost_price' => 24.00,
                 'quantity' => 50,
+                'low_stock_threshold' => 6,
+                'material' => '100% Organic Cotton',
+                'gender' => 'unisex',
+                'season' => 'autumn',
+                'is_active' => true,
+                'is_featured' => true,
+                'track_quantity' => true,
+                'collection_ids' => [$collection['core-essentials']->id],
+                'tag_ids' => [$tag['organic-cotton']->id],
+                'images' => ['sweatshirt-1'],
+            ],
+            [
+                'name' => 'Baggy Jeans Washed Blue',
+                'slug' => 'baggy-jeans-washed-blue',
+                'sku' => 'JEA-001',
+                'description' => 'Wide-leg jeans with a faded light wash and a long break at the ankle. Rigid denim that softens with wear.',
+                'short_description' => 'Wide-leg washed denim',
+                'category_id' => $category['men-denim']->id,
+                'brand_id' => $brand['low-tide']->id,
+                'price' => 89.00,
+                'compare_at_price' => null,
+                'cost_price' => 35.00,
+                'quantity' => 45,
                 'low_stock_threshold' => 5,
-                'material' => '98% Cotton, 2% Elastane',
+                'material' => '100% Cotton denim',
                 'gender' => 'men',
                 'season' => 'all_season',
                 'is_active' => true,
                 'is_featured' => true,
                 'track_quantity' => true,
-                'collection_ids' => [$collections[4]->id],
-                'tag_ids' => [$tags[1]->id, $tags[5]->id],
+                'collection_ids' => [$collection['denim-edit']->id, $collection['core-essentials']->id],
+                'tag_ids' => [$tag['best-seller']->id],
+                'images' => ['jeans-1', 'jeans-2'],
             ],
             [
-                'name' => 'Floral Summer Dress',
-                'slug' => 'floral-summer-dress',
-                'sku' => 'DRS-001',
-                'description' => 'Beautiful floral print dress perfect for summer days.',
-                'short_description' => 'Floral print summer dress',
-                'category_id' => $categories[5]->id, // Women -> Dresses
-                'brand_id' => $brands[6]->id, // Tommy Hilfiger
-                'price' => 89.99,
-                'compare_at_price' => 119.99,
-                'cost_price' => 40.00,
-                'quantity' => 30,
-                'low_stock_threshold' => 5,
-                'material' => '100% Viscose',
-                'gender' => 'women',
-                'season' => 'summer',
-                'is_active' => true,
-                'is_featured' => true,
-                'track_quantity' => true,
-                'collection_ids' => [$collections[1]->id],
-                'tag_ids' => [$tags[0]->id, $tags[2]->id],
-            ],
-            [
-                'name' => 'Running Shoes Pro',
-                'slug' => 'running-shoes-pro',
-                'sku' => 'SHO-001',
-                'description' => 'Professional running shoes with advanced cushioning.',
-                'short_description' => 'Pro running shoes',
-                'category_id' => $categories[3]->id, // Accessories
-                'brand_id' => $brands[1]->id, // Adidas
-                'price' => 149.99,
-                'compare_at_price' => 179.99,
-                'cost_price' => 65.00,
+                'name' => 'Wide-Leg Jeans Dark Wash',
+                'slug' => 'wide-leg-jeans-dark-wash',
+                'sku' => 'JEA-002',
+                'description' => 'High-rise wide-leg jeans in a dark indigo wash. Relaxed through the hip and thigh, floor-skimming length.',
+                'short_description' => 'High-rise wide-leg denim',
+                'category_id' => $category['women-denim']->id,
+                'brand_id' => $brand['alley-cat']->id,
+                'price' => 92.00,
+                'compare_at_price' => 115.00,
+                'cost_price' => 38.00,
                 'quantity' => 40,
                 'low_stock_threshold' => 5,
-                'material' => 'Mesh & Synthetic',
+                'material' => '100% Cotton denim',
+                'gender' => 'women',
+                'season' => 'all_season',
+                'is_active' => true,
+                'is_featured' => false,
+                'track_quantity' => true,
+                'collection_ids' => [$collection['denim-edit']->id, $collection['drop-01']->id],
+                'tag_ids' => [$tag['new-arrival']->id],
+                'images' => ['jeans-wide-1'],
+            ],
+            [
+                'name' => 'Boxy Logo Tee',
+                'slug' => 'boxy-logo-tee',
+                'sku' => 'TSH-001',
+                'description' => 'Boxy black tee in heavy cotton jersey with a small circular print on the chest.',
+                'short_description' => 'Boxy heavy cotton tee',
+                'category_id' => $category['men-tees']->id,
+                'brand_id' => $brand['sennitwo']->id,
+                'price' => 34.00,
+                'compare_at_price' => null,
+                'cost_price' => 11.00,
+                'quantity' => 120,
+                'low_stock_threshold' => 15,
+                'material' => '100% Cotton',
                 'gender' => 'unisex',
                 'season' => 'all_season',
                 'is_active' => true,
                 'is_featured' => true,
                 'track_quantity' => true,
-                'collection_ids' => [$collections[3]->id],
-                'tag_ids' => [$tags[1]->id, $tags[6]->id],
+                'collection_ids' => [$collection['core-essentials']->id, $collection['after-dark']->id],
+                'tag_ids' => [$tag['best-seller']->id, $tag['organic-cotton']->id],
+                'images' => ['tee-1'],
             ],
             [
-                'name' => 'Hooded Sweatshirt',
-                'slug' => 'hooded-sweatshirt',
-                'sku' => 'HOD-001',
-                'description' => 'Cozy hooded sweatshirt for cooler weather.',
-                'short_description' => 'Comfortable hoodie',
-                'category_id' => $categories[0]->id, // Men
-                'brand_id' => $brands[3]->id, // Under Armour
-                'price' => 59.99,
-                'compare_at_price' => 79.99,
-                'cost_price' => 25.00,
-                'quantity' => 60,
-                'low_stock_threshold' => 8,
-                'material' => '80% Cotton, 20% Polyester',
-                'gender' => 'men',
+                'name' => 'Hooded Coach Jacket',
+                'slug' => 'hooded-coach-jacket',
+                'sku' => 'JAC-001',
+                'description' => 'Lightweight coach jacket with a contrast hood and back print. Water-resistant shell, snap front.',
+                'short_description' => 'Coach jacket with contrast hood',
+                'category_id' => $category['men-jackets']->id,
+                'brand_id' => $brand['night-shift']->id,
+                'price' => 119.00,
+                'compare_at_price' => 149.00,
+                'cost_price' => 52.00,
+                'quantity' => 35,
+                'low_stock_threshold' => 5,
+                'material' => 'Nylon shell, polyester lining',
+                'gender' => 'unisex',
+                'season' => 'autumn',
+                'is_active' => true,
+                'is_featured' => true,
+                'track_quantity' => true,
+                'collection_ids' => [$collection['winter-layers']->id, $collection['after-dark']->id],
+                'tag_ids' => [$tag['waterproof']->id, $tag['limited-edition']->id],
+                'images' => ['jacket-1'],
+            ],
+            [
+                'name' => 'Printed Overshirt',
+                'slug' => 'printed-overshirt',
+                'sku' => 'OVS-001',
+                'description' => 'Oversized overshirt with an all-over print, worn open over a cropped top. Soft drape, dropped shoulders.',
+                'short_description' => 'Oversized printed overshirt',
+                'category_id' => $category['women-outerwear']->id,
+                'brand_id' => $brand['overgrown']->id,
+                'price' => 98.00,
+                'compare_at_price' => null,
+                'cost_price' => 41.00,
+                'quantity' => 30,
+                'low_stock_threshold' => 4,
+                'material' => '100% Viscose',
+                'gender' => 'women',
                 'season' => 'autumn',
                 'is_active' => true,
                 'is_featured' => false,
                 'track_quantity' => true,
-                'collection_ids' => [$collections[2]->id, $collections[3]->id],
-                'tag_ids' => [$tags[3]->id, $tags[7]->id],
+                'collection_ids' => [$collection['drop-01']->id],
+                'tag_ids' => [$tag['new-arrival']->id, $tag['limited-edition']->id],
+                'images' => ['overshirt-1'],
             ],
         ];
 
         $products = [];
         foreach ($productsData as $productData) {
-            $collectionIds = $productData['collection_ids'] ?? [];
-            $tagIds = $productData['tag_ids'] ?? [];
-            unset($productData['collection_ids'], $productData['tag_ids']);
+            $collectionIds = $productData['collection_ids'];
+            $tagIds = $productData['tag_ids'];
+            $images = $productData['images'];
+            unset($productData['collection_ids'], $productData['tag_ids'], $productData['images']);
 
             $product = Product::firstOrCreate(['sku' => $productData['sku']], $productData);
             $product->collections()->sync($collectionIds);
             $product->tags()->sync($tagIds);
+
+            // Photos are local-only; products simply have no image when the files are not there.
+            foreach ($images as $position => $file) {
+                if ($path = DemoPhoto::path($file)) {
+                    $product->images()->firstOrCreate(
+                        ['path' => $path],
+                        ['alt_text' => $product->name, 'sort_order' => $position + 1, 'is_primary' => $position === 0],
+                    );
+                }
+            }
+
             $products[] = $product;
         }
 
@@ -431,11 +498,16 @@ class CatalogSeeder extends Seeder
         $colorValues = ProductAttributeValue::where('attribute_id', $attributes['color']->id)->get();
         $sizeValues = ProductAttributeValue::where('attribute_id', $attributes['size']->id)->get();
 
+        // Colourways that make sense for each product; sizes are the usual clothing run.
+        $colorways = [
+            'HOD-001' => ['black', 'grey'], 'SWE-001' => ['beige', 'black'], 'JEA-001' => ['blue', 'grey'],
+            'JEA-002' => ['navy', 'black'], 'TSH-001' => ['black', 'white'], 'JAC-001' => ['black', 'navy'],
+            'OVS-001' => ['green', 'brown'],
+        ];
+
         foreach ($products as $product) {
-            // Create 3-4 variants per product
-            $variantCount = rand(3, 4);
-            $selectedColors = $colorValues->random(min($variantCount, $colorValues->count()));
-            $selectedSizes = $sizeValues->random(min(3, $sizeValues->count()));
+            $selectedColors = $colorValues->whereIn('slug', $colorways[$product->sku] ?? ['black']);
+            $selectedSizes = $sizeValues->whereIn('slug', ['s', 'm', 'l', 'xl']);
 
             foreach ($selectedColors as $color) {
                 foreach ($selectedSizes as $size) {

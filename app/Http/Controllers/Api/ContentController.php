@@ -10,6 +10,7 @@ use App\Models\Menu;
 use App\Models\Page;
 use App\Models\Size;
 use App\Models\Tag;
+use App\Support\MediaUrl;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -21,7 +22,10 @@ class ContentController extends Controller
         $banners = Banner::active()->current()->ordered()
             ->when($request->query('position'), fn ($q, $position) => $q->byPosition($position))
             ->get()
-            ->map->only(['id', 'title', 'subtitle', 'description', 'image', 'mobile_image', 'link_url', 'link_text', 'position']);
+            ->map(fn (Banner $banner) => array_merge(
+                $banner->only(['id', 'title', 'subtitle', 'description', 'link_url', 'link_text', 'position']),
+                ['image' => MediaUrl::public($banner->image), 'mobile_image' => MediaUrl::public($banner->mobile_image)],
+            ));
 
         return response()->json(['data' => $banners]);
     }

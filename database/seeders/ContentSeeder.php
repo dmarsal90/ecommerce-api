@@ -30,7 +30,7 @@ class ContentSeeder extends Seeder
             [
                 'title' => 'Spring Sale - Up to 50% Off',
                 'subtitle' => 'Refresh your wardrobe with amazing deals',
-                'image' => 'banners/spring-sale.jpg',
+                'image' => DemoPhoto::path('sweatshirt-1'),
                 'link_url' => '/collections/spring-2024',
                 'link_text' => 'Shop Now',
                 'position' => 'homepage_hero',
@@ -42,7 +42,7 @@ class ContentSeeder extends Seeder
             [
                 'title' => 'New Arrivals',
                 'subtitle' => 'Check out our latest collection',
-                'image' => 'banners/new-arrivals.jpg',
+                'image' => DemoPhoto::path('jacket-1'),
                 'link_url' => '/new-arrivals',
                 'link_text' => 'View Collection',
                 'position' => 'homepage_hero',
@@ -54,7 +54,7 @@ class ContentSeeder extends Seeder
             [
                 'title' => 'Free Shipping on Orders $50+',
                 'subtitle' => 'Limited time offer',
-                'image' => 'banners/free-shipping.jpg',
+                'image' => null,
                 'link_url' => null,
                 'link_text' => null,
                 'position' => 'homepage_section',
@@ -64,11 +64,11 @@ class ContentSeeder extends Seeder
                 'end_date' => now()->addMonths(6)->format('Y-m-d'),
             ],
             [
-                'title' => 'Summer Essentials',
-                'subtitle' => 'Stay cool in style',
-                'image' => 'banners/summer-essentials.jpg',
-                'link_url' => '/collections/summer-essentials',
-                'link_text' => 'Shop Summer',
+                'title' => 'Core Essentials',
+                'subtitle' => 'Pieces you wear on repeat',
+                'image' => DemoPhoto::path('tee-1'),
+                'link_url' => '/collections/core-essentials',
+                'link_text' => 'Shop Essentials',
                 'position' => 'category_top',
                 'is_active' => true,
                 'sort_order' => 1,
@@ -78,7 +78,7 @@ class ContentSeeder extends Seeder
             [
                 'title' => 'Newsletter Signup',
                 'subtitle' => 'Get 10% off your first order',
-                'image' => 'banners/newsletter.jpg',
+                'image' => null,
                 'link_url' => '/newsletter',
                 'link_text' => 'Subscribe',
                 'position' => 'product_page',
@@ -314,7 +314,7 @@ class ContentSeeder extends Seeder
                 'type' => 'brand_showcase',
                 'title' => 'Our Brands',
                 'settings' => [
-                    'brands' => ['nike', 'adidas', 'puma', 'under-armour', 'new-balance', 'levis'],
+                    'brands' => ['sennitwo', 'concrete-club', 'night-shift', 'low-tide', 'alley-cat', 'paper-planes'],
                     'scrollable' => true,
                 ],
                 'sort_order' => 6,

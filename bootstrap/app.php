@@ -5,6 +5,7 @@ use App\Http\Middleware\AuthRateLimiter;
 use App\Http\Middleware\CartToken;
 use App\Http\Middleware\NoStore;
 use App\Http\Middleware\SecurityHeaders;
+use App\Http\Middleware\SetLocale;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -26,9 +27,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'security.headers' => SecurityHeaders::class,
             'cart.token' => CartToken::class,
             'no-store' => NoStore::class,
+            'set.locale' => SetLocale::class,
         ]);
 
         $middleware->group('api', [
+            'set.locale',
             'api.rate-limiter',
             'security.headers',
         ]);
