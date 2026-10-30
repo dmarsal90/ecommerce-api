@@ -53,4 +53,16 @@ class ContentControllerTest extends TestCase
         $this->getJson('/api/config')->assertOk()
             ->assertJsonStructure(['data' => ['name', 'currency', 'tax_rate', 'free_shipping_threshold', 'shipping_cost']]);
     }
+
+    public function test_banner_images_are_urls_clients_can_load(): void
+    {
+        Banner::create(['title' => 'Hero', 'slug' => 'hero', 'position' => 'hero', 'is_active' => true, 'image' => 'demo/hero.jpg', 'mobile_image' => 'https://cdn.example/m.jpg']);
+        Banner::create(['title' => 'Plain', 'slug' => 'plain', 'position' => 'hero', 'is_active' => true]);
+
+        $banners = $this->getJson('/api/banners?position=hero')->assertOk()->json('data');
+
+        $this->assertStringEndsWith('/storage/demo/hero.jpg', $banners[0]['image']);
+        $this->assertSame('https://cdn.example/m.jpg', $banners[0]['mobile_image']);
+        $this->assertNull($banners[1]['image']);
+    }
 }

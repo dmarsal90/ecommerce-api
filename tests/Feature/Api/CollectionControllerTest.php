@@ -74,4 +74,15 @@ class CollectionControllerTest extends TestCase
                 'collection' => ['id', 'name', 'slug'],
             ]);
     }
+
+    public function test_collection_brand_and_category_images_are_loadable_urls(): void
+    {
+        Collection::factory()->create(['is_active' => true, 'image' => 'demo/tee-1.jpg']);
+        Brand::factory()->create(['is_active' => true, 'logo' => 'brands/x.png']);
+        Category::factory()->create(['is_active' => true, 'image' => null]);
+
+        $this->assertStringEndsWith('/storage/demo/tee-1.jpg', $this->getJson('/api/collections')->assertOk()->json('data.0.image'));
+        $this->assertStringEndsWith('/storage/brands/x.png', $this->getJson('/api/brands')->assertOk()->json('data.0.logo'));
+        $this->assertNull($this->getJson('/api/categories')->assertOk()->json('data.0.image'));
+    }
 }
