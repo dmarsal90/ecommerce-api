@@ -16,7 +16,6 @@ use App\Models\Size;
 use App\Models\SizeGroup;
 use App\Models\Tag;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class CatalogSeeder extends Seeder
@@ -114,11 +113,11 @@ class CatalogSeeder extends Seeder
     private function seedCollections(): array
     {
         $data = [
-            ['name' => 'Drop 01', 'slug' => 'drop-01', 'description' => 'The first drop of the season', 'is_active' => true, 'sort_order' => 1],
-            ['name' => 'Core Essentials', 'slug' => 'core-essentials', 'description' => 'Pieces you wear on repeat', 'is_active' => true, 'sort_order' => 2],
-            ['name' => 'Winter Layers', 'slug' => 'winter-layers', 'description' => 'Hoods, jackets and heavy knits', 'is_active' => true, 'sort_order' => 3],
-            ['name' => 'After Dark', 'slug' => 'after-dark', 'description' => 'Black on black, built for the night', 'is_active' => true, 'sort_order' => 4],
-            ['name' => 'Denim Edit', 'slug' => 'denim-edit', 'description' => 'Baggy, wide and washed', 'is_active' => true, 'sort_order' => 5],
+            ['name' => 'Drop 01', 'slug' => 'drop-01', 'description' => 'The first drop of the season', 'image' => DemoPhoto::path('overshirt-1'), 'is_active' => true, 'sort_order' => 1],
+            ['name' => 'Core Essentials', 'slug' => 'core-essentials', 'description' => 'Pieces you wear on repeat', 'image' => DemoPhoto::path('tee-1'), 'is_active' => true, 'sort_order' => 2],
+            ['name' => 'Winter Layers', 'slug' => 'winter-layers', 'description' => 'Hoods, jackets and heavy knits', 'image' => DemoPhoto::path('jacket-1'), 'is_active' => true, 'sort_order' => 3],
+            ['name' => 'After Dark', 'slug' => 'after-dark', 'description' => 'Black on black, built for the night', 'image' => DemoPhoto::path('hoodie-1'), 'is_active' => true, 'sort_order' => 4],
+            ['name' => 'Denim Edit', 'slug' => 'denim-edit', 'description' => 'Baggy, wide and washed', 'image' => DemoPhoto::path('jeans-1'), 'is_active' => true, 'sort_order' => 5],
         ];
 
         $collections = [];
@@ -480,9 +479,9 @@ class CatalogSeeder extends Seeder
 
             // Photos are local-only; products simply have no image when the files are not there.
             foreach ($images as $position => $file) {
-                if (Storage::disk('public')->exists("demo/$file.jpg")) {
+                if ($path = DemoPhoto::path($file)) {
                     $product->images()->firstOrCreate(
-                        ['path' => "demo/$file.jpg"],
+                        ['path' => $path],
                         ['alt_text' => $product->name, 'sort_order' => $position + 1, 'is_primary' => $position === 0],
                     );
                 }
