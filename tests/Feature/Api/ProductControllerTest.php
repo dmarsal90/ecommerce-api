@@ -276,4 +276,19 @@ class ProductControllerTest extends TestCase
         $variant = ProductVariant::factory()->create(['product_id' => $product->id, 'is_active' => true]);
         $variant->attributeValues()->attach(collect($values)->pluck('id'));
     }
+
+    public function test_product_images_are_returned_as_loadable_urls_in_order(): void
+    {
+        $product = Product::factory()->create(['is_active' => true]);
+        $product->images()->create(['path' => 'demo/second.jpg', 'alt_text' => null, 'sort_order' => 2]);
+        $product->images()->create(['path' => 'demo/first.jpg', 'alt_text' => 'Front', 'sort_order' => 1]);
+        $product->images()->create(['path' => 'https://cdn.example/remote.jpg', 'sort_order' => 3]);
+
+        $images = $this->getJson("/api/products/{$product->slug}")->assertOk()->json('data.images');
+
+        $this->assertSame(['Front', null, null], array_column($images, 'alt'));
+        $this->assertStringEndsWith('/storage/demo/first.jpg', $images[0]['url']);
+        $this->assertSame([1, 2, 3], array_column($images, 'position'));
+        $this->assertSame('https://cdn.example/remote.jpg', $images[2]['url']);
+    }
 }
